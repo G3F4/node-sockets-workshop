@@ -1,11 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const renderLandingView = () => {
+  const renderTemplateById = id => {
     const rootNode = document.getElementById('root');
-    const landingTemplate = document.getElementById('landing');
-    const landingNode = document.importNode(landingTemplate.content, true);
+    const template = document.getElementById(id);
+    const node = template.content.cloneNode(true);
 
     rootNode.innerHTML = '';
-    rootNode.appendChild(landingNode);
+    rootNode.appendChild(node);
+  };
+  const renderLandingView = () => {
+    renderTemplateById('landing');
 
     const loginParticipantNode = document.getElementById('loginParticipant');
     const loginTrainerNode = document.getElementById('loginTrainer');
@@ -15,12 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loginTrainerNode.addEventListener('click', renderTrainerLoginView);
   };
   const renderParticipantLoginView = () => {
-    const rootNode = document.getElementById('root');
-    const participantLoginTemplate = document.getElementById('participantLogin');
-    const participantLoginNode = document.importNode(participantLoginTemplate.content, true);
-
-    rootNode.innerHTML = '';
-    rootNode.appendChild(participantLoginNode);
+    renderTemplateById('participantLogin');
 
     const participantLoginFormNode = document.getElementById('participantLoginForm');
 
@@ -29,22 +27,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const formData = new FormData(event.target);
 
-      ws.send(JSON.stringify({
-        action: 'PARTICIPANT_LOGIN',
-        payload: {
-          name: formData.get('name'),
-          group: formData.get('group'),
-        },
-      }))
+      sendAction('PARTICIPANT_LOGIN', {
+        name: formData.get('name'),
+        group: formData.get('group'),
+      });
     });
   };
   const renderTrainerLoginView = () => {
-    const rootNode = document.getElementById('root');
-    const trainerLoginTemplate = document.getElementById('trainerLogin');
-    const trainerLoginNode = document.importNode(trainerLoginTemplate.content, true);
-
-    rootNode.innerHTML = '';
-    rootNode.appendChild(trainerLoginNode);
+    renderTemplateById('trainerLogin');
 
     const trainerLoginFormNode = document.getElementById('trainerLoginForm');
 
@@ -53,22 +43,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const formData = new FormData(event.target);
 
-      ws.send(JSON.stringify({
-        action: 'TRAINER_LOGIN',
-        payload: {
-          name: formData.get('name'),
-          code: formData.get('code'),
-        },
-      }))
+      sendAction('TRAINER_LOGIN', {
+        name: formData.get('name'),
+        code: formData.get('code'),
+      });
     });
   };
   const renderIssueSubmitView = () => {
-    const rootNode = document.getElementById('root');
-    const issueSubmitTemplate = document.getElementById('issueSubmit');
-    const issueSubmitNode = document.importNode(issueSubmitTemplate.content, true);
-
-    rootNode.innerHTML = '';
-    rootNode.appendChild(issueSubmitNode);
+    renderTemplateById('issueSubmit');
 
     const issueSubmitFormNode = document.getElementById('issueSubmitForm');
 
@@ -77,49 +59,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const formData = new FormData(event.target);
 
-      ws.send(JSON.stringify({
-        action: 'TRAINER_NEEDED',
-        payload: {
-          problem: formData.get('problem'),
-        },
-      }))
+      sendAction('TRAINER_NEEDED', {
+        problem: formData.get('problem'),
+      });
     });
   };
   const renderIssueReceivedView = () => {
-    const rootNode = document.getElementById('root');
-    const issueReceivedTemplate = document.getElementById('issueReceived');
-    const issueReceivedNode = document.importNode(issueReceivedTemplate.content, true);
-
-    rootNode.innerHTML = '';
-    rootNode.appendChild(issueReceivedNode);
+    renderTemplateById('issueReceived');
   };
   const renderIssueTakenView = trainerName => {
-    const rootNode = document.getElementById('root');
-    const issueTakenTemplate = document.getElementById('issueTaken');
-    const issueTakenNode = document.importNode(issueTakenTemplate.content, true);
-    const issueTakenHeaderNode = issueTakenNode.getElementById('issueTakenHeader');
-    const issueSolvedButtonNode = issueTakenNode.getElementById('issueSolved');
+    renderTemplateById('issueTaken');
+    const issueTakenHeaderNode = document.getElementById('issueTakenHeader');
+    const issueSolvedButtonNode = document.getElementById('issueSolved');
 
     issueSolvedButtonNode.addEventListener('click', () => {
-      ws.send(JSON.stringify({
-        action: 'ISSUE_SOLVED',
-      }));
+      sendAction('ISSUE_SOLVED');
       renderIssueSubmitView();
     });
 
     issueTakenHeaderNode.textContent = `Trener ${trainerName} przyjął Twoje zgłoszenie, zaraz podejdzie.`;
-    rootNode.innerHTML = '';
-    rootNode.appendChild(issueTakenNode);
   };
   const renderTrainerDashboardView = data => {
-    const rootNode = document.getElementById('root');
-    const trainerDashboardTemplate = document.getElementById('trainerDashboard');
+    renderTemplateById('trainerDashboard');
+
     const issueListItemTemplate = document.getElementById('issueListItem');
-    const trainerDashboardNode = document.importNode(trainerDashboardTemplate.content, true);
-
-    rootNode.innerHTML = '';
-    rootNode.appendChild(trainerDashboardNode);
-
     const issueListNode = document.getElementById('issueList');
 
     data.forEach(it => {
@@ -134,11 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (it.status === 'PENDING') {
         takeIssueButtonNode.addEventListener('click', () => {
-          console.log(['it'], it);
-          ws.send(JSON.stringify({
-            action: 'ISSUE_TAKEN',
-            payload: it.id,
-          }));
+          sendAction('ISSUE_TAKEN', it.id);
         });
       } else {
         takeIssueButtonNode.classList.add('hide');
@@ -149,6 +108,9 @@ document.addEventListener('DOMContentLoaded', () => {
   renderLandingView();
 
   const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss': 'ws'}://${document.location.href.split('//')[1]}`);
+  const sendAction = (action, payload) => {
+    ws.send(JSON.stringify({ action, payload }));
+  };
 
   ws.onopen = event => {
     console.log(['WebSocket.onopen'], event);
@@ -162,7 +124,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     switch (action) {
       case 'PARTICIPANT_LOGGED': {
-        console.log('uczestnik zalogowany');
         renderIssueSubmitView();
         break;
       }
@@ -187,6 +148,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
   ws.onerror = event => {
-    console.log(['WebSocket.onerror'], event);
+    console.error(['WebSocket.onerror'], event);
   };
 });

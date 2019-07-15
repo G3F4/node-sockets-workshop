@@ -1,0 +1,16 @@
+{
+    "defaultSeverity": "error",
+    "extends": [
+        "tslint:recommended"
+    ],
+    "jsRules": {},
+    "rules": {
+        "quotemark": {
+            "options": ["single"]
+        },
+        "arrow-parens": {
+            "options": "ban-single-arg-parens"
+        }
+    },
+    "rulesDirectory": []
+}

@@ -1,0 +1,37 @@
+{
+  "name": "warsawjs-workshop-34-trainer-needed",
+  "version": "0.0.1",
+  "main": "src/index.ts",
+  "repository": "git@github.com:G3F4/warsawjs-workshop-34-trainer-needed.git",
+  "author": "G3F4",
+  "license": "MIT",
+  "scripts": {
+    "start": "ts-node src/index.ts",
+    "dev": "ts-node-dev --respawn --transpileOnly src/index.ts",
+    "lint": "tslint -c tslint.json 'src/**/*{.ts,.tsx}'",
+    "lint:fix": "tslint --fix -c tslint.json 'src/**/*{.ts,.tsx}'",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "websockets",
+    "web",
+    "socket",
+    "typescript",
+    "warsawjs"
+  ],
+  "bugs": {
+    "url": "https://github.com/G3F4/websockets-boilerplate/issues"
+  },
+  "homepage": "https://github.com/G3F4/websockets-boilerplate#readme",
+  "dependencies": {
+    "@types/node": "12.6.2",
+    "@types/ws": "6.0.1",
+    "ts-node": "8.3.0",
+    "typescript": "3.5.3",
+    "ws": "7.1.0"
+  },
+  "devDependencies": {
+    "ts-lint": "4.5.1",
+    "ts-node-dev": "1.0.0-pre.40"
+  }
+}

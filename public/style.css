@@ -1,0 +1,23 @@
+body {
+    background-color: #eee;
+}
+
+#root {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#time-now {
+    text-align: center;
+}
+
+.header {
+    font-family: monospace;
+}
+
+.counter {
+    display: flex;
+    justify-content: space-around;
+}

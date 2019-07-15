@@ -8,5 +8,91 @@
 </head>
 <body>
     <div id="root"></div>
+    <template id="landing">
+        <h1>Trainer needed</h1>
+        <div>Tak zajebiście działa aplikacja.</div>
+        <div>Kim jesteś?</div>
+        <div>
+            <button id="loginParticipant">Uczestnikiem</button>
+            <button id="loginTrainer">Trenerem</button>
+        </div>
+    </template>
+    <template id="participantLogin">
+        <h1>Zaloguj się jako uczestnik</h1>
+        <form id="participantLoginForm">
+            <div>
+                Nazwa uczestnika
+                <input name="name" />
+            </div>
+            <div>
+                Grupa uczestnika
+                <input name="group" />
+            </div>
+            <div>
+                <button type="submit">Zaloguj</button>
+            </div>
+        </form>
+    </template>
+    <template id="trainerLogin">
+        <h1>Zaloguj się jako trener</h1>
+        <form id="trainerLoginForm">
+            <div>
+                Nazwa trenera
+                <input name="name" />
+            </div>
+            <div>
+                Tajny kod
+                <input name="code" />
+            </div>
+            <div>
+                <button type="submit">Zaloguj</button>
+            </div>
+        </form>
+    </template>
+    <template id="issueSubmit">
+        <h1>Jaki masz problem?</h1>
+        <form id="issueSubmitForm">
+            <div>
+                <label>
+                    <textarea rows="10" cols="120" name="problem"></textarea>
+                </label>
+            </div>
+            <div>
+                <button type="submit">Wyślij</button>
+            </div>
+        </form>
+    </template>
+    <template id="issueReceived">
+        <h1>Czekaj na trenera, zostaniesz poinformowany<br /> kiedy trener przyjmie zgłoszenie</h1>
+    </template>
+    <template id="issueTaken">
+        <h1 id="issueTakenHeader"></h1>
+        <div>
+            <button id="issueSolved">Problem rozwiązany</button>
+        </div>
+    </template>
+    <template id="trainerDashboard">
+        <h1>Zgłoszenia uczestników</h1>
+        <div id="issueList">
+            <div class="issueListItemHeader">
+                <div>Nazwa uczestnika</div>
+                <div>Grupa uczestnika</div>
+                <div>Opis problemu</div>
+                <div>Status zgłoszenia</div>
+                <div>Akcje do wykonania</div>
+            </div>
+        </div>
+    </template>
+    <template id="issueListItem">
+        <div class="issueListItem">
+            <div class="issueListItemName"></div>
+            <div class="issueListItemGroup"></div>
+            <div class="issueListItemProblem"></div>
+            <div class="issueListItemStatus"></div>
+            <div class="issueListItemActions">
+                <button>Przymij zgłoszenie</button>
+            </div>
+        </div>
+    </template>
 </body>
 </html>

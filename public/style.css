@@ -5,6 +5,7 @@ body {
 #root {
     height: 100vh;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
 }
@@ -20,4 +21,34 @@ body {
 .counter {
     display: flex;
     justify-content: space-around;
+}
+
+.issueListItemHeader {
+    margin: 8px;
+    display: flex;
+    justify-content: space-around;
+    border-bottom: 1px solid;
+}
+
+.issueListItemHeader > div {
+    width: 20%;
+    padding: 8px;
+    border: 1px solid;
+}
+
+.issueListItem {
+    margin: 8px;
+    display: flex;
+    justify-content: space-around;
+    border-bottom: 1px solid;
+}
+
+.issueListItem > div {
+    width: 20%;
+    border: 1px solid;
+    padding: 8px;
+}
+
+.hide {
+    display: none;
 }

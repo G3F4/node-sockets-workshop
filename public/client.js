@@ -45,7 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       sendAction('TRAINER_LOGIN', {
         name: formData.get('name'),
-        code: formData.get('code'),
       });
     });
   };

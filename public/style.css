@@ -6,6 +6,7 @@ body {
     align-items: center;
     justify-content: center;
     text-align: center;
+    font-size: 16px;
 }
 
 #landingActions {
@@ -13,16 +14,31 @@ body {
     display: flex;
 }
 
-#landingActions > button {
+input, select {
+    min-width: 200px;
+}
+
+button {
     flex-grow: 1;
     font-size: 20px;
-    width: 150px;
     padding: 8px;
 }
 
-#landingActions > button:hover {
+button:hover {
     background-color: rgba(163, 163, 163, 0.83);
 }
+
+form > div {
+    display: flex;
+    flex-direction: column;
+    margin: 16px;
+}
+
+form > div > div {
+    display: flex;
+    justify-content: space-between;
+}
+
 
 .issueListItemHeader {
     margin: 8px;

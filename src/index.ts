@@ -9,7 +9,6 @@ export interface User {
   data: {
     name: string;
     group?: string;
-    code?: string;
   };
   socket: WebSocket;
 }

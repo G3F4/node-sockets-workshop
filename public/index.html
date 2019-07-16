@@ -21,12 +21,14 @@
         <h1>Zaloguj się jako uczestnik</h1>
         <form id="participantLoginForm">
             <div>
-                Nazwa uczestnika
-                <input name="name" />
-            </div>
-            <div>
-                Grupa uczestnika
-                <input name="group" />
+                <div>
+                    Nazwa
+                    <input name="name" />
+                </div>
+                <div>
+                    Grupa
+                    <input name="group" />
+                </div>
             </div>
             <div>
                 <button type="submit">Zaloguj</button>
@@ -36,13 +38,11 @@
     <template id="trainerLogin">
         <h1>Zaloguj się jako trener</h1>
         <form id="trainerLoginForm">
-            <div>
-                Nazwa trenera
-                <input name="name" />
-            </div>
-            <div>
-                Tajny kod
-                <input name="code" />
+            <div class="trainerLoginFormInputs">
+                <div>
+                    Nazwa
+                    <input name="name" />
+                </div>
             </div>
             <div>
                 <button type="submit">Zaloguj</button>

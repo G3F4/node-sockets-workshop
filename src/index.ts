@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import http from 'http';
 import * as process from 'process';
-import { Server } from 'ws';
+import * as WebSocket from 'ws';
 import { Action, IssueStatus, StaticFileExtension } from './types';
 
 export interface User {
@@ -11,8 +11,9 @@ export interface User {
     group?: string;
     code?: string;
   };
-  socket: any;
+  socket: WebSocket;
 }
+
 export interface Issue {
   id: string;
   status: IssueStatus;
@@ -74,7 +75,7 @@ const server = http.createServer({}, (req, res) => {
     });
 
     // read file
-    const file = readFileSync(`${process.cwd()}/public${url}`, 'utf8');
+    const file = readFileSync(`${process.cwd()}/public${url}`);
 
     // end response - send
     res.end(file);
@@ -84,7 +85,7 @@ const server = http.createServer({}, (req, res) => {
   }
 });
 
-const wss = new Server({ server });
+const wss = new WebSocket.Server({ server });
 
 wss.on('connection', ws => {
   process.stdout.write('connection\n');
@@ -100,7 +101,7 @@ wss.on('connection', ws => {
           id: `participant-id-${Date.now()}`,
           data: payload,
           socket: ws,
-        };
+        } as User;
 
         state.participants = [...state.participants, user];
 
@@ -114,7 +115,7 @@ wss.on('connection', ws => {
           id: `trainer-id-${Date.now()}`,
           data: payload,
           socket: ws,
-        };
+        } as User;
 
         state.trainers = [...state.trainers, user];
 
@@ -207,6 +208,6 @@ wss.on('connection', ws => {
   });
 });
 
-server.listen(process.env.PORT || 3000, () => {
+server.listen(process.env.PORT || 5000, () => {
   process.stdout.write('server started\n');
 });

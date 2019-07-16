@@ -69,3 +69,7 @@ form > div > div {
 .hide {
     display: none;
 }
+
+.textAlignLeft {
+    text-align: left;
+}

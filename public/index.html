@@ -77,6 +77,14 @@
             <button id="issueSolved">Problem rozwiązany</button>
         </div>
     </template>
+    <template id="hintReceived">
+        <h1>Dostałeś wskazówke od trenera:</h1>
+        <pre id="hint" class="textAlignLeft"></pre>
+        <div>
+            <button id="hintSuccess">Problem rozwiązany</button>
+            <button id="hintFail">Wskazówka nie pomogła</button>
+        </div>
+    </template>
     <template id="trainerDashboard">
         <h1>Zgłoszenia uczestników</h1>
         <div id="issueList">
@@ -97,6 +105,13 @@
             <div class="issueListItemStatus"></div>
             <div class="issueListItemActions">
                 <button>Przymij zgłoszenie</button>
+                <form class="issueListHintForm">
+                    <label>
+                        Napisz wskazówkę
+                        <textarea name="hint"></textarea>
+                    </label>
+                    <button type="submit">Wyślij</button>
+                </form>
             </div>
         </div>
     </template>

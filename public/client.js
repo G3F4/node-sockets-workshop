@@ -78,6 +78,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     issueTakenHeaderNode.textContent = `Trener ${trainerName} przyjął Twoje zgłoszenie, zaraz podejdzie.`;
   };
+  const renderHintReceivedView = hint => {
+    renderTemplateById('hintReceived');
+    const hintNode = document.getElementById('hint');
+    const hintSuccessButtonNode = document.getElementById('hintSuccess');
+    const hintFailButtonNode = document.getElementById('hintFail');
+
+    hintSuccessButtonNode.addEventListener('click', () => {
+      sendAction('ISSUE_SOLVED');
+      renderIssueSubmitView();
+    });
+    hintFailButtonNode.addEventListener('click', () => {
+      sendAction('HINT_FAIL');
+      renderIssueReceivedView();
+    });
+
+    hintNode.textContent = hint;
+  };
   const renderTrainerDashboardView = data => {
     renderTemplateById('trainerDashboard');
 
@@ -87,6 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
     data.forEach(it => {
       const issueListItemNode = document.importNode(issueListItemTemplate.content, true);
       const takeIssueButtonNode = issueListItemNode.querySelector('.issueListItemActions button');
+      const issueListHintFormNode = issueListItemNode.querySelector('.issueListHintForm');
 
       issueListItemNode.querySelector('.issueListItemName').textContent = it.userName;
       issueListItemNode.querySelector('.issueListItemGroup').textContent = it.userGroup;
@@ -94,12 +112,31 @@ document.addEventListener('DOMContentLoaded', () => {
       issueListItemNode.querySelector('.issueListItemStatus').textContent = it.status;
       issueListNode.appendChild(issueListItemNode);
 
+      issueListHintFormNode.addEventListener('submit', event => {
+        event.preventDefault();
+        console.log(['submit'])
+
+        const formData = new FormData(event.target);
+
+        sendAction('HINT_SENT', {
+          hint: formData.get('hint'),
+          userId: it.userId,
+        });
+      });
+
       if (it.status === 'PENDING') {
         takeIssueButtonNode.addEventListener('click', () => {
           sendAction('ISSUE_TAKEN', it.id);
         });
+        issueListHintFormNode.classList.add('hide');
+      } else if (it.status === 'TAKEN') {
+        takeIssueButtonNode.classList.add('hide');
+      } else if (it.status === 'SOLVED') {
+        takeIssueButtonNode.classList.add('hide');
+        issueListHintFormNode.classList.add('hide');
       } else {
         takeIssueButtonNode.classList.add('hide');
+        issueListHintFormNode.classList.add('hide');
       }
     });
   };
@@ -139,6 +176,10 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       case 'ISSUE_TAKEN': {
         renderIssueTakenView(payload);
+        break;
+      }
+      case 'HINT_RECEIVED': {
+        renderHintReceivedView(payload);
         break;
       }
       case 'ISSUES': {

@@ -13,9 +13,11 @@ export type Action = 'PARTICIPANT_LOGIN'
   | 'TRAINER_NEEDED'
   | 'ISSUE_TAKEN'
   | 'ISSUE_SOLVED'
+  | 'HINT_SENT'
+  | 'HINT_FAIL'
 ;
 
-export type IssueStatus = 'PENDING' | 'TAKEN' | 'SOLVED';
+export type IssueStatus = 'PENDING' | 'TAKEN' | 'SOLVED' | 'HINT';
 
 export interface User {
   id: string;

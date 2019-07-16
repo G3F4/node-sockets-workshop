@@ -2,31 +2,40 @@ import { readFileSync } from 'fs';
 import http from 'http';
 import * as process from 'process';
 import * as WebSocket from 'ws';
-import { Action, IssueStatus, StaticFileExtension } from './types';
+import {
+  Action,
+  FileExtensionToContentTypeMap,
+  State,
+  StaticFileExtension,
+  User,
+} from './types';
 
-export interface User {
-  id: string;
-  data: {
-    name: string;
-    group?: string;
-  };
-  socket: WebSocket;
-}
+const PORT = process.env.PORT || 5000;
 
-export interface Issue {
-  id: string;
-  status: IssueStatus;
-  userId: string;
-  userName: string;
-  userGroup: string;
-  problem: string;
-}
+const FILE_EXTENSION_TO_CONTENT_TYPE: FileExtensionToContentTypeMap = {
+  css: 'text/css',
+  html: 'text/html',
+  ico: 'image/x-icon',
+  js: 'text/javascript',
+};
 
-export interface State {
-  participants: User[];
-  trainers: User[];
-  issues: Issue[];
-}
+const server = http.createServer({}, (req, res) => {
+  try {
+    const url = req.url && req.url !== '/' ? req.url : '/index.html';
+    const urlParts = url.split('.');
+    const fileExtension = urlParts[urlParts.length - 1] as StaticFileExtension;
+    const contentType = FILE_EXTENSION_TO_CONTENT_TYPE[fileExtension];
+
+    res.writeHead(200, { 'Content-Type': contentType });
+
+    const file = readFileSync(`${process.cwd()}/public${url}`);
+
+    res.end(file);
+  } catch (e) {
+    console.error(`error: ${e.toString()}`);
+    res.end(e.toString());
+  }
+});
 
 const state: State = {
   participants: [],
@@ -34,72 +43,18 @@ const state: State = {
   issues: [],
 };
 
-const server = http.createServer({}, (req, res) => {
-  try {
-    // read url
-    const url = req.url && req.url !== '/' ? req.url : '/index.html';
-    process.stdout.write(`${url}\n`);
-    process.stdout.write(`${JSON.stringify(req.headers)}\n`);
+const webSocketsServer = new WebSocket.Server({ server });
 
-    // split url by dot to extract file extension
-    const urlParts = url.split('.');
-    const fileExtension = urlParts[urlParts.length - 1] as StaticFileExtension;
-    let contentType = '';
-
-    // set Content-Type header based on file extension
-    switch (fileExtension) {
-      case 'html': {
-        contentType = 'text/html';
-        break;
-      }
-      case 'css': {
-        contentType = 'text/css';
-        break;
-      }
-      case 'js': {
-        contentType = 'text/javascript';
-        break;
-      }
-      case 'ico': {
-        // TODO dlaczego ikona jest pusta
-        contentType = 'image/x-icon';
-        break;
-      }
-      default:
-        contentType = 'text/html';
-    }
-
-    res.writeHead(200, {
-      'Content-Type': contentType,
-    });
-
-    // read file
-    const file = readFileSync(`${process.cwd()}/public${url}`);
-
-    // end response - send
-    res.end(file);
-  } catch (e) {
-    process.stdout.write(`error: ${e.toString()}\n`);
-    res.end(e.toString());
-  }
-});
-
-const wss = new WebSocket.Server({ server });
-
-wss.on('connection', ws => {
-  process.stdout.write('connection\n');
-  ws.on('message', message => {
-    process.stdout.write('message\n');
+webSocketsServer.on('connection', socket => {
+  socket.on('message', message => {
     const { action, payload } = JSON.parse(message.toString());
-
-    console.log(['{ action, payload }'], { action, payload })
 
     switch (action as Action) {
       case 'PARTICIPANT_LOGIN': {
         const user = {
           id: `participant-id-${Date.now()}`,
           data: payload,
-          socket: ws,
+          socket,
         } as User;
 
         state.participants = [...state.participants, user];
@@ -107,13 +62,14 @@ wss.on('connection', ws => {
         user.socket.send(JSON.stringify({
           action: 'PARTICIPANT_LOGGED',
         }));
+
         break;
       }
       case 'TRAINER_LOGIN': {
         const user = {
           id: `trainer-id-${Date.now()}`,
           data: payload,
-          socket: ws,
+          socket,
         } as User;
 
         state.trainers = [...state.trainers, user];
@@ -126,8 +82,7 @@ wss.on('connection', ws => {
         break;
       }
       case 'TRAINER_NEEDED': {
-        console.log('TRAINER_NEEDED');
-        const user = state.participants.find(it => it.socket === ws);
+        const user = state.participants.find(it => it.socket === socket);
 
         if (!user) break;
 
@@ -139,6 +94,7 @@ wss.on('connection', ws => {
           userName: user.data.name,
           userGroup: user.data.group as string,
         }];
+
         user.socket.send(JSON.stringify({
           action: 'ISSUE_RECEIVED',
         }));
@@ -153,9 +109,8 @@ wss.on('connection', ws => {
         break;
       }
       case 'ISSUE_TAKEN': {
-        console.log('ISSUE_TAKEN');
         const issue = state.issues.find(it => it.id === payload);
-        const trainer = state.trainers.find(it => it.socket === ws);
+        const trainer = state.trainers.find(it => it.socket === socket);
 
         if (!issue || !trainer) break;
 
@@ -180,8 +135,7 @@ wss.on('connection', ws => {
         break;
       }
       case 'ISSUE_SOLVED': {
-        console.log('ISSUE_SOLVED');
-        const participant = state.participants.find(it => it.socket === ws);
+        const participant = state.participants.find(it => it.socket === socket);
 
         if (!participant) break;
 
@@ -201,12 +155,12 @@ wss.on('connection', ws => {
         break;
       }
       default: {
-        console.log('unknown action');
+        console.error('unknown action');
       }
     }
   });
 });
 
-server.listen(process.env.PORT || 5000, () => {
-  process.stdout.write('server started\n');
+server.listen(PORT, () => {
+  console.info(`server started on port ${PORT}`);
 });

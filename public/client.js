@@ -106,24 +106,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
   renderLandingView();
 
-  const ws = new WebSocket(`${location.protocol === 'https:' ? 'wss': 'ws'}://${document.location.href.split('//')[1]}`);
+  const socketProtocol = location.protocol === 'https:' ? 'wss': 'ws';
+  const href = document.location.href.split('//')[1];
+  const params = `userId:${window.localStorage.getItem('userId')}`;
+  const ws = new WebSocket(`${socketProtocol}://${href}?${params}`);
   const sendAction = (action, payload) => {
     ws.send(JSON.stringify({ action, payload }));
   };
 
   ws.onopen = event => {
-    console.log(['WebSocket.onopen'], event);
+    console.info(['WebSocket.onopen'], event);
   };
   ws.onclose = event => {
-    console.log(['WebSocket.onclose'], event);
+    console.info(['WebSocket.onclose'], event);
   };
   ws.onmessage = event => {
     const { action, payload } = JSON.parse(event.data);
-    console.log(['WebSocket.onmessage'], { action, payload });
+    console.info(['WebSocket.onmessage'], { action, payload });
 
     switch (action) {
       case 'PARTICIPANT_LOGGED': {
         renderIssueSubmitView();
+        break;
+      }
+      case 'TRAINER_LOGGED': {
+        renderTrainerDashboardView(payload);
         break;
       }
       case 'ISSUE_RECEIVED': {
@@ -134,13 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderIssueTakenView(payload);
         break;
       }
-      case 'TRAINER_LOGGED': {
-        console.log('trener zalogowany');
-        renderTrainerDashboardView(payload);
-        break;
-      }
       case 'ISSUES': {
-        console.log('trener zalogowany');
         renderTrainerDashboardView(payload);
         break;
       }

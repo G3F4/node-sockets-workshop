@@ -204,6 +204,10 @@ webSocketsServer.on('connection', socket => {
       }
     }
   });
+  socket.on('close', () => {
+    state.participants = state.participants.filter(user => user.socket !== socket);
+    state.trainers = state.trainers.filter(user => user.socket !== socket);
+  });
 });
 
 server.listen(PORT, () => {

@@ -34,4 +34,22 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   renderLandingView();
+
+  const socket = new WebSocket('ws://localhost:5000');
+
+  socket.onopen = event => {
+    console.log(['WebSocket.onopen'], event);
+  };
+
+  socket.onclose = event => {
+    console.log(['WebSocket.onclose'], event);
+  };
+
+  socket.onmessage = event => {
+    console.log(['WebSocket.onmessage'], event.data);
+  };
+
+  socket.onerror = event => {
+    console.error(['WebSocket.onerror'], event);
+  };
 });

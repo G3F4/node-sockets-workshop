@@ -41,6 +41,10 @@ const server = http.createServer( (request, response) => {
 const webSocketsServer = new WebSocket.Server({ server });
 
 webSocketsServer.on('connection', (socket: WebSocket) => {
+  console.log('socket connected');
+
+  socket.send('welcome');
+
   socket.on('message', message => {
     console.log(['socket message'], message);
   });

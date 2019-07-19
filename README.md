@@ -5,116 +5,118 @@
 Do rozpoczęcia pracy potrzebny jest serwer obsługujący protokuł http. 
 Dodać prosty serwer serwujący pliku statyczne z folderu `public`.
 
-* `src/index.ts`
+* Hello world serwera http (`/src/index.ts`)
 
-  * Hello world serwera http
-  
-    * Utworzyć serwer przy wykorzystaniu funkcji `createServer` ze wbudowanego modułu `http` 
-  
-      * Zapisać do stałej `server`
-        
-      * Przekazać handler serwera w postaci funkcji `(request, response) => {...}`
-  
-        * Dodać blok `try catch`, który obejmie cały kod handlera
-          
-          * w przypadku błędu wyświetlić błąd do konsoli
-          
-          * wysłać odpowiedź w postać `e.toString()` gdzie `e` to wyłapany błąd przez `catch`
-        
-        * Handler serwera w odpowiedzi na wszystkie zapytania zwraca tekst `Test server` 
-        
-          * Wykorzystać metodę `end` obiektu `response`
-  
-    * Dodać nasłuchiwanie wykorzystując metodę `listen` obiektu `server`
+  * Utworzyć serwer przy wykorzystaniu funkcji `createServer` ze wbudowanego modułu `http` 
+
+    * Zapisać do stałej `server`
       
-      * Przekazać jako pierwszy argument stałą `PORT`
+    * Przekazać handler serwera w postaci funkcji `(request, response) => {...}`
+
+      * Dodać blok `try catch`, który obejmie cały kod handlera
+        
+        * w przypadku błędu wyświetlić błąd do konsoli
+        
+        * wysłać odpowiedź w postać `e.toString()` gdzie `e` to wyłapany błąd przez `catch`
       
-      * Jako drugi funkcję, która wywoła się po uruchomieniu serwera
+      * Handler serwera w odpowiedzi na wszystkie zapytania zwraca tekst `Test server` 
       
-        * Użyć `console.log` aby sprawdzić czy serwer rozpoczął nasłuchiwanie na porcie
-  
-  * Modyfikacja handlera serwera, tak aby zwracał pliki statyczne 
-  
-    * Zapisać do stałej `url` adres URL z obiektu zapytania wykorzystując `request.url` 
+        * Wykorzystać metodę `end` obiektu `response`
+
+  * Dodać nasłuchiwanie wykorzystując metodę `listen` obiektu `server`
     
-      * W przypadku gdy adres jest równy `/` ustawić wartość `index.html`
-      
-        * Wykorzystać operator `? :`
-        
-    * Utworznie stałej `urlParts` z wartością `url.split('.')`
-  
-    * Utworznie stałej `fileExtension` z wartością ostatniego elementu tablicy `urlParts`
+    * Przekazać jako pierwszy argument stałą `PORT`
     
-    * Utworznie stałej `contentType` z wartością z mapy `FILE_EXTENSION_TO_CONTENT_TYPE`, której kluczami są rozszerzenia plików
+    * Jako drugi funkcję, która wywoła się po uruchomieniu serwera
+    
+      * Użyć `console.log` aby sprawdzić czy serwer rozpoczął nasłuchiwanie na porcie
+
+* Modyfikacja handlera serwera, tak aby zwracał pliki statyczne 
+
+  * Zapisać do stałej `url` adres URL z obiektu zapytania wykorzystując `request.url` 
   
-    * Ustawić status odpowiedzi wykorzystując metodę `writeHead` obiektu odpowiedzi (drugi argument handlera, zazwyczaj nazywany `res`) 
+    * W przypadku gdy adres jest równy `/` ustawić wartość `index.html`
+    
+      * Wykorzystać operator `? :`
+      
+  * Utworznie stałej `urlParts` z wartością `url.split('.')`
+
+  * Utworznie stałej `fileExtension` z wartością ostatniego elementu tablicy `urlParts`
   
-      * Jako pierwszy argument przekazać status odpowiedzi równy `200` 
-  
-      * Jako drugi argument przekazać obiekt `{ 'Content-Type': contentType }`
-  
-    * Wczytanie pliku 
-  
-      * Wykorzystać funckje `readFileSync` ze wbudowanego modułu `fs`  
-        
-        * Zapisać do stałej `file`
-  
-        * Jako pierwszy argument przekazać absolutną ścieżkę do pliku 
-  
-          * Do pobrania ścieżki projektu możesz skorzystać z `proces.cwd()` 
-  
-    * Wykorzystując metodę `response.end` zakończyć zapytanie przekazując do metody zawartość wczytanego pliku  
+  * Utworznie stałej `contentType` z wartością z mapy `FILE_EXTENSION_TO_CONTENT_TYPE`, której kluczami są rozszerzenia plików
+
+  * Ustawić status odpowiedzi wykorzystując metodę `writeHead` obiektu odpowiedzi (drugi argument handlera, zazwyczaj nazywany `res`) 
+
+    * Jako pierwszy argument przekazać status odpowiedzi równy `200` 
+
+    * Jako drugi argument przekazać obiekt `{ 'Content-Type': contentType }`
+
+  * Wczytanie pliku 
+
+    * Wykorzystać funckje `readFileSync` ze wbudowanego modułu `fs`  
+      
+      * Zapisać do stałej `file`
+
+      * Jako pierwszy argument przekazać absolutną ścieżkę do pliku 
+
+        * Do pobrania ścieżki projektu możesz skorzystać z `proces.cwd()` 
+
+  * Wykorzystując metodę `response.end` zakończyć zapytanie przekazując do metody zawartość wczytanego pliku  
   
 ## 2. Dodanie WebSocketów 
 
+Ustanowić stałe połaączenie pomiędzy klientem a serwerem wykorzystując WebSockety
+
 ### Serwer: (`/src/index.ts`) 
 
-* `index.ts`
+* Utworzyć nową instancję serwera `new WebSocket.Server` o nazwie `webSocketsServer` 
 
-  * Utworzyć nową instancję serwera `new Server` o nazwie `webSocketsServer` 
-  
-    * Przekazać do konstruktora obiekt konfiguracyjny z kluczem `server`, wskazujący na referencje do serwera HTTP 
-  
-  * Dodać do serwera WebSockets nasłuchiwanie na `event` połączenia o nazwie `connection` przy wykorzystaniu metody `on` 
-  
-    * Klasa `Server` z pakietu `ws` dziedziczy do klasie `EventEmmiter` 
-  
-    * Handler eventu `connection` jako argument wywołania dostaje socket, który reprezentuje połączenie z klientem 
-  
-    * Handler w reakcji na event połączenia odsyła wiadomość powitalną `connected to socket server` wykorzystując metodę `send` 
-  
-  * Dodać do serwera `WebSockets` nasłuchiwanie na `event` połączenia o nazwie `message` przy wykorzystaniu metody `on` 
-  
-    * W reakcji na zdarzenie wypisać do konsoli dane eventu dostępne w polu `data` 
+  * Przekazać do konstruktora obiekt konfiguracyjny z kluczem `server`, wskazujący na referencje do serwera HTTP 
+
+* Dodać do serwera WebSockets nasłuchiwanie na `event` połączenia o nazwie `connection` przy wykorzystaniu metody `on` 
+
+  * Klasa `Server` z pakietu `ws` dziedziczy do klasie `EventEmmiter` 
+
+  * Handler eventu `connection` jako argument wywołania dostaje socket, który reprezentuje połączenie z klientem 
+
+    * Wypisać do konsoli `socket connected`
+    
+    * Odesłać wiadomość powitalną o treści `welcome` wykorzystując `socket.send` 
+
+* Dodać do `webSocketsServer` nasłuchiwanie na event `message` przy wykorzystaniu metody `on` 
+
+  * Wypisać do konsoli dane eventu dostępne w argumencie handlera 
+
+* Dodać do `webSocketsServer` nasłuchiwanie na event `close` przy wykorzystaniu metody `on` 
+
+  * Wypisać do konsoli `socket closed`
 
 
 ### Klient: (`/public/client.js`) 
 
-* Dodać nasłuchiwanie na event `DOMContentLoaded` wykorzystując metodę `addEventListner`  
+* W handlerze eventu `DOMContentLoaded` stworzyć nowe polaczeniem do serwera `WebSockets` 
 
-  * Handler eventu tworzy nowe polaczeniem do serwera `WebSockets` 
+  * Utworzyć instancję socketa wykorzystując klasę `WebSockets` o nazwie `socket` 
 
-    * Utworzyć instancję socketa wykorzystując klasę `WebSockets` o nazwie `socket` 
+    * Konstruktor przyjmuje argument typu `string`, który reprezentuje adres serwera WebSockets `ws://localhost:5000`
 
-      * Konstruktor przyjmuje argument typu `string`, który reprezentuje adres serwera `WebSockets` 
+  * Zaimplementować obsługę eventów: 
 
-    * Zaimplementować obsługę eventów: 
+    * `onopen` - wywoływany po ustanowieniu połączenia z serwerem 
 
-      * `onopen` - wywoływany po ustanowieniu połączenia z serwerem 
+      * W reakcji na event: `console.log(['WebSocket.onopen'], event);`
 
-        * W reakcji na event klient odsyła wiadomość powitalną `hello server` wykorzystując metodę `send` obiektu `socket` (instancja klasy `WebSockets`) 
+    * `onmessage` - wywoływany przy każdej wiadomości serwera 
 
-      * `onmessage` - wywoływany przy każdej wiadomości serwera 
+      * W reakcji na event: `console.log(['WebSocket.onmessage'], event);`  
 
-        * W reakcji na zdarzenie wypisać do konsoli dane eventu dostępne  pod polem `data` obiektu eventu  
+    * `onerror` - wywoływany przy każdym błędzie komunikacji z serwerem 
 
-      * `onerror` - wywoływany przy każdym błędzie komunikacji z serwerem 
+      * W reakcji na event: `console.log(['WebSocket.onerror'], event);`  
 
-        * W reakcji na zdarzenie wypisać do konsoli błąd  
+    * `onclose` - wywoływany w sytuacji kiedy serwer zakończy połączenie z socketem 
 
-      * `onclose` - wywoływany w sytuacji kiedy serwer zakończy połączenie z socketem 
-
-        * W reakcji na zdarzenie wypisać do konsoli informację o przerwaniu połączenia z serwerem  
+      * W reakcji na event: `console.log(['WebSocket.onclose'], event);`  
 
 ## 3. Autentykacja użytkownika 
 

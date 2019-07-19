@@ -18,26 +18,6 @@
 
 ## 2. Pliki statyczne  
 
-* Utworzyć folder `public` w głównym folderze projektu  
-
-   * Wewnątrz folderu utworzyć pliki statyczne projektu: 
-
-    * `style.css` 
-
-      * Dodać styl dla body resetujący domyślny `padding` i `margin` 
-
-    * `client.js` 
-
-      * Dodać wywołanie `console.log('client test')` 
-
-    * `index.html`  
-
-      * Dodać minimalny poprawny dokument `html`.  
-
-        * Dodać powiązanie do wcześniej utworzonych plików `style.css`, `client.js`  
-
-        * Dodać pusty element `div` z atrybutem `id="root"` 
-
 * Modyfikacja handlera serwera, tak aby zwracał pliki statyczne 
 
   * Odczytanie do stałej (`const`) o nazwie `url` adresu `URL` z obiektu zapytania (zazwyczaj nazywany `req`, pierwszy argument wywołania handlera) wykorzystując atrybut obiektu zapytania `req.url` 

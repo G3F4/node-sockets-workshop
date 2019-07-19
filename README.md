@@ -122,109 +122,145 @@ Ustanowić stałe połaączenie pomiędzy klientem a serwerem wykorzystując Web
 
 ### Klient: 
 
-* Dodać ekran powitalny  
+* Dodać funckję do wysyłanie eventów:
 
-  * Dodać funkcję renderującą ekran powitalny `renderLandingView` 
+```javascript
+const sendEvent = (action, payload) => {
+  try {
+    socket.send(JSON.stringify({ action, payload }));
+  }
+
+  catch (e) {
+    console.error(e);
+  }
+};
+```
+
+* Na ekranie powitalnym (funckja `renderLandingView`)
   
-    * Zapisać do stałej `rootNode` referencję do węzła o `id="root" wykorzystując `document.getElementById` 
-    
-    * Analogicznie zrobić z szablonem (`<template id="landing">`), nazwać referenję `landingTemplate` 
-    
-    * Stworzyć nowy element na podstawie szablonu wykorzystując `document.importNode` - nazwa `landingNode` 
-    
-      * Jako pierwszy argument przekazać `landingTemplate.content` 
-    
-      * Jako drugi `true` 
-    
-    * Wyczyścić zawartośc `rootNode` 
-    
-      * `rootNode.innerHTML = '';` 
-    
-    * Dodać do głównego węzła stworzony element: 
-    
-      * `rootNode.appendChild(landingNode);` 
-    
-    * Dodać nasłuchiwanie na kliknięcie w element z `id="loginParticipant"` wykorzystując `addEventListener` 
-    
-      * Stworzyć pustą funkcję `renderParticipantLoginView` 
-    
-      * Przekazać nową funkcję jako handler zdarzenia kliknięcia 
-    
-    * Analogicznie dla elementu z `id="loginParticipant"` 
+  * WAŻNE: `renderTemplateById` musi być zawsze wywołane w pierwszej kolejności, inaczej elementy ekranu nie będą wyrenderowane, nie będzie można z nimi nic zrobić
 
-* Ekran logowania uczestnika  
-
-  * Dodać funkcję renderującą ekran logowania uczestnika analogicznie do strony powitalnej - `renderParticipantLoginView` 
+  * Dodać nasłuchiwanie na kliknięcie w element z `id="loginParticipant"` wykorzystując `addEventListener` oraz `getNodeById`
   
-    * Dodać nasłuchiwanie na event `submit` na elemencie formularza z `id="participantLoginForm"` 
+    * Przekazać nową funkcję jako handler funckję `renderParticipantLoginView`
+  
+  * Analogicznie zrobić dla elementu z `id="trainerParticipant"` 
+
+* Ekran logowania uczestnika (funkcja `renderParticipantLoginView`)
+
+  * Dodać nasłuchiwanie na event `submit` na elemencie formularza z `id="participantLoginForm"` 
+  
+    * Zablokować domyślne działanie zdarzenia poprzez `event.preventDefault();`
     
-      * Postać eventu: 
+    * Wykorzystać `FormData` do zebrania danych z formulurza 
+    
+      * `const formData = new FormData(event.target);` 
       
-        * `action` o wartości `PARTICIPANT_LOGIN` 
+      * Dostęp do danych `formData.get(group)` gdzie `group` do wartość atrybutu `name` elementu input formularza 
+      
+      * Nazwy pól w formularzu: 
         
-        * `payload` o wartości danych z formularza  
+        * `name` 
         
-          * Wykorzystać `FormData` do zebrania danych z formulurza 
-          
-          * `const formData = new FormData(event.target);` 
-          
-          * Dostęp do danych `formData.get(group)` gdzie `group` do wartość atrybutu `name` elementu input formularza 
-          
-          * Nazwy pól w formularzu: 
-            
-            * `name` 
-            
-            * `group` 
+        * `group` 
+        
+    * Wykorzystać funkcję `sendEvent` do wysłania eventu do serwera WebSocket, przekazać obiekt z kluczami: 
+    
+      * `action` o wartości `PARTICIPANT_LOGIN` 
+      
+      * `payload` o wartości danych z formularza w postaci obiektu, gdzie nazwy pól to klucze
+      
 
 * Ekran logowania trenera 
 
-  * Dodać funkcję renderującą ekran logowania uczestnika analogicznie do strony powitalnej - `renderTrainerLoginView` 
-
-    * Dodać nasłuchiwanie na event `submit` formularza `id="trainerLoginForm"` 
+  * Wykonać analogicznie dla ekranu logowania uczestnika
 
 ### Serwer 
 
-Obsługa eventu logowania  
+* Dodać obiekt na poziomie pliku, który będzie reprezentował stan serwera
 
-  * Dodać obiekt na poziomie pliku, który będzie reprezentował stan serwera - `state` 
+  * Obiekt zawiera dwie kolekcje, symulujące kanały
+```javascript
+const state: State = {
+  participants: [],
+  trainers: [],
+};
+```
+
+* Obiekt reprezentujący podłączonego użytkownika 
+
+  * `type` - `PARTICIPANT` lub `TRAINER` 
   
-    * Dodać pole `users` z inicjalnie pustą tablicą 
+  * `data` - dane zebrane podczas logowania 
   
-  * Obiekt reprezentujący podłączonego użytkownika 
+  * `socket` - referencja do socketa użytkownika 
   
-    * `type` - `PARTICIPANT` lub `TRAINER` 
-    
-    * `data` - dane zebrane podczas logowania 
-    
-    * `socket` - referencja do socketa użytkownika 
-    
-  * Po połączeniu (event `connection`) zapisać do kolekcji nowy socket, zostawiając pola `userType` oraz `userData` puste 
+* Na poziomie pliku dodać funckję wysyłające event dbającą o obsługę błędu
+
+```javascript
+const sendEvent = (socket: WebSocket, event: Event): void => {
+  try {
+    socket.send(JSON.stringify(event));
+  }
+
+  catch (e) {
+    console.error(e);
+  }
+};
+```
   
-  * Dodać prosty system akcji przy wykorzystaniu instrukcji warunkowej `switch` w handlerze eventu `message` 
-    
-    * Sparsować zawartość pola `data` eventu wykorzystując `JSON.parse` 
-    
-      * Zapisać do stałych pola obiektu `action` oraz `payload` 
-    
+* Po połączeniu (event `connection`) stworzyć w domknięciu stałą reprezentującą połączonego użytkownika
+
+```javascript
+const connectedUser: User = {
+  id: `user-id-${Date.now()}`,
+  data: {
+    name: '',
+    group: '',
+  },
+  socket,
+};
+```
+
+* W evencie `message`:
+
+  * Sparsować argument eventu zrzutowany do `string` (`.toString()`) wykorzystując `JSON.parse` 
+  
+    * Zapisać do stałych pola obiektu `action` oraz `payload` 
+
+  * Dodać prosty system akcji przy wykorzystaniu instrukcji warunkowej `switch`
+  
     * Wykorzystać `action` w instrukcji `switch` 
+    
+      ```javascript
+      switch (action as Action) {
+        case 'PARTICIPANT_LOGIN': {
+        ...
+          break;
+        }
+        case 'TRAINER_LOGIN': {
+        ...
+          break;
+        }
+        default: {
+          console.error('unknown action');
+        }
+      }
+      ```
       
       * Dodać obsługę akcji `PARTICIPANT_LOGIN` 
       
-        * Znaleźć w kolekcji obiekt zawierający socket, który wywołał event `message` 
+        * Zaktualizować dane połączonego użytkownika `connectedUser.data` zawartością `payload` 
         
-        * Zaktualizować pola `userType` na `PARTICIPANT` 
-        
-        * Zaktualizować  wartość pola `userData` zawartością `payload` 
+        * Dodać połączonego użytkownika do kanału uczestników `state.participants`
         
         * Wysłać akcję `PARTICIPANT_LOGGED` z pustym `payload` 
         
       * Dodać obsługę akcji `TRAINER_LOGIN` 
         
-        * Znaleźć w kolekcji obiekt zawierający socket, który wywołał event `message` 
-        
-        * Zaktualizować pola `userType` na `TRAINER` 
-        
-        * Zaktualizować  wartość pola `userData` zawartością `payload` 
+        * Zaktualizować dane połączonego użytkownika `connectedUser.data` zawartością `payload` 
+                
+        * Dodać połączonego użytkownika do kanału uczestników `state.trainers`
         
         * Wysłać akcję `TRAINER_LOGGED` z pustym `payload` 
 

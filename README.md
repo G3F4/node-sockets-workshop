@@ -268,28 +268,45 @@ const connectedUser: User = {
 
 ### Klient: 
 
-* Dodać ekran wysyłania sygnału pomocy  
+* W evencie `onmessage` dodać prosty system nasłuchiwania na akcje, analogiczny do tego z serwera
 
-  * Wyświetlić `input` na krótki opis problemu 
+```javascript
+switch (action) {
+      case 'PARTICIPANT_LOGGED': {
+        break;
+      }
+    }
+```
+
+* Dodać obługę akcji `PARTICIPANT_LOGGED`
+
+  * Wywołać funckję `renderIssueSubmitView`
   
-  * Wyświetlić przycisk z tekstem `Trainer needed` 
+* Dodać obsługę akcji `ISSUE_RECEIVED`
 
-* Po zalogowaniu wyświetlić ekran wysyłania sygnału pomocy  
-
-* Dodać obsługę kliknięcia w przycisk `Trainer needed` 
-
-  * Po kliknięciu wysłać event z `action` o wartości  `TRAINER_NEEDED` i `payload` z wartością inputa z opisem problemu  
+  * Wywołać funckję `renderIssueReceivedView`
+  
+* Na ekranie zgłaszania sygnału pomocy
+  
+  * Dodać obsługę eventu `submit` formularza o `id="issueSubmitForm"`
+  
+    * Po kliknięciu wysłać event z `action` o wartości  `TRAINER_NEEDED` i `payload` z wartością inputa `problem`
+     
 
 ### Serwer: 
 
-* Dodać kolekcje reprezentującą zgłoszenia uczestników w postaci: 
+* Dodać kolekcje reprezentującą zgłoszenia uczestników do stanu serwera pod kluczem `issues` w postaci: 
   
   * `id` - unikalny identyfikator  
   
-  * `status` - enum o wartości `RECEVIED` 
+  * `status` - statnus zgłoszenia
   
   * `userId` - identyfikator uczestnika 
   
+  * `userName` - nazwa uczestnika
+  
+  * `userGroup` - grupa uczestnika
+   
   * `problem` - opis problemu  
 
 * Dodać obsługę akcji `TRAINER_NEEDED` 

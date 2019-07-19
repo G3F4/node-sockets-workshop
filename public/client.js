@@ -49,6 +49,19 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   const renderIssueSubmitView = () => {
     renderTemplateById('issueSubmit');
+
+    getNodeById('issueSubmitForm').addEventListener('submit', event => {
+      event.preventDefault();
+
+      const formData = new FormData(event.target);
+
+      sendEvent({
+        action: 'TRAINER_NEEDED',
+        payload: {
+          problem: formData.get('problem'),
+        },
+      });
+    });
   };
   const renderIssueReceivedView = () => {
     renderTemplateById('issueReceived');
@@ -86,6 +99,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   socket.onmessage = event => {
     console.log(['WebSocket.onmessage'], event.data);
+    const { action, payload } = JSON.parse(event.data);
+
+    switch (action) {
+      case 'PARTICIPANT_LOGGED': {
+        renderIssueSubmitView();
+        break;
+      }
+      case 'ISSUE_RECEIVED': {
+        renderIssueReceivedView();
+        break;
+      }
+    }
   };
 
   socket.onerror = event => {

@@ -51,6 +51,7 @@ const sendEvent = (socket: WebSocket, event: Event): void => {
 const state: State = {
   participants: [],
   trainers: [],
+  issues: [],
 };
 
 const webSocketsServer = new WebSocket.Server({ server });
@@ -66,8 +67,6 @@ webSocketsServer.on('connection', (socket: WebSocket) => {
     },
     socket,
   };
-
-  socket.send('welcome');
 
   socket.on('message', message => {
     console.log(['socket message'], message);
@@ -89,6 +88,20 @@ webSocketsServer.on('connection', (socket: WebSocket) => {
         sendEvent(connectedUser.socket, {
           action: 'TRAINER_LOGGED',
         });
+
+        break;
+      }
+      case 'TRAINER_NEEDED': {
+        state.issues = [...state.issues, {
+          id: `issue-id-${Date.now()}`,
+          problem: payload.problem,
+          status: 'PENDING',
+          userId: connectedUser.id,
+          userName: connectedUser.data.name,
+          userGroup: connectedUser.data.group,
+        }];
+
+        sendEvent(connectedUser.socket, { action: 'ISSUE_RECEIVED' });
 
         break;
       }

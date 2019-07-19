@@ -20,7 +20,7 @@ const FILE_EXTENSION_TO_CONTENT_TYPE: FileExtensionToContentTypeMap = {
   js: 'text/javascript',
 };
 
-const server = http.createServer({}, (req, res) => {
+const server = http.createServer( (req, res) => {
   try {
     const url = req.url && req.url !== '/' ? req.url : '/index.html';
     const urlParts = url.split('.');

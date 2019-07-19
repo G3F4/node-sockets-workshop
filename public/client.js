@@ -1,23 +1,23 @@
 document.addEventListener('DOMContentLoaded', () => {
   const renderTemplateById = id => {
-    const rootNode = getElementById('root');
-    const template = getElementById(id);
+    const rootNode = getNodeById('root');
+    const template = getNodeById(id);
     const node = template.content.cloneNode(true);
 
     rootNode.innerHTML = '';
     rootNode.appendChild(node);
   };
-  const getElementById = id => getElementById(id);
+  const getNodeById = id => document.getElementById(id);
   const renderLandingView = () => {
     renderTemplateById('landing');
 
-    getElementById('loginParticipant').addEventListener('click', renderParticipantLoginView);
-    getElementById('loginTrainer').addEventListener('click', renderTrainerLoginView);
+    getNodeById('loginParticipant').addEventListener('click', renderParticipantLoginView);
+    getNodeById('loginTrainer').addEventListener('click', renderTrainerLoginView);
   };
   const renderParticipantLoginView = () => {
     renderTemplateById('participantLogin');
 
-    getElementById('participantLoginForm').addEventListener('submit', event => {
+    getNodeById('participantLoginForm').addEventListener('submit', event => {
       event.preventDefault();
 
       const formData = new FormData(event.target);
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const renderTrainerLoginView = () => {
     renderTemplateById('trainerLogin');
 
-    getElementById('trainerLoginForm').addEventListener('submit', event => {
+    getNodeById('trainerLoginForm').addEventListener('submit', event => {
       event.preventDefault();
 
       const formData = new FormData(event.target);
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const renderIssueSubmitView = () => {
     renderTemplateById('issueSubmit');
 
-    getElementById('issueSubmitForm').addEventListener('submit', event => {
+    getNodeById('issueSubmitForm').addEventListener('submit', event => {
       event.preventDefault();
 
       const formData = new FormData(event.target);
@@ -60,32 +60,32 @@ document.addEventListener('DOMContentLoaded', () => {
   const renderIssueTakenView = trainerName => {
     renderTemplateById('issueTaken');
 
-    getElementById('issueSolved').addEventListener('click', () => {
+    getNodeById('issueSolved').addEventListener('click', () => {
       sendAction('ISSUE_SOLVED');
       renderIssueSubmitView();
     });
 
-    getElementById('issueTakenHeader').textContent = `Trener ${trainerName} przyjął Twoje zgłoszenie, zaraz podejdzie.`;
+    getNodeById('issueTakenHeader').textContent = `Trener ${trainerName} przyjął Twoje zgłoszenie, zaraz podejdzie.`;
   };
   const renderHintReceivedView = hint => {
     renderTemplateById('hintReceived');
 
-    getElementById('hintSuccess').addEventListener('click', () => {
+    getNodeById('hintSuccess').addEventListener('click', () => {
       sendAction('ISSUE_SOLVED');
       renderIssueSubmitView();
     });
-    getElementById('hintFail').addEventListener('click', () => {
+    getNodeById('hintFail').addEventListener('click', () => {
       sendAction('HINT_FAIL');
       renderIssueReceivedView();
     });
 
-    getElementById('hint').textContent = hint;
+    getNodeById('hint').textContent = hint;
   };
   const renderTrainerDashboardView = data => {
     renderTemplateById('trainerDashboard');
 
-    const issueListItemTemplate = getElementById('issueListItem');
-    const issueListNode = getElementById('issueList');
+    const issueListItemTemplate = getNodeById('issueListItem');
+    const issueListNode = getNodeById('issueList');
 
     data.forEach(it => {
       const issueListItemNode = document.importNode(issueListItemTemplate.content, true);

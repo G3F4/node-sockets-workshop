@@ -87,6 +87,7 @@ webSocketsServer.on('connection', (socket: WebSocket) => {
 
         sendEvent(connectedUser.socket, {
           action: 'TRAINER_LOGGED',
+          payload: state.issues,
         });
 
         break;
@@ -102,6 +103,13 @@ webSocketsServer.on('connection', (socket: WebSocket) => {
         }];
 
         sendEvent(connectedUser.socket, { action: 'ISSUE_RECEIVED' });
+
+        state.trainers.forEach(({ socket }) => {
+          sendEvent(socket, {
+            action: 'ISSUES',
+            payload: state.issues,
+          });
+        });
 
         break;
       }

@@ -321,52 +321,54 @@ switch (action) {
 
 * Wysyłanie listy zgłoszeń  
 
-  * Po zalogowaniu trenera wysłać event z akcją `ISSUE_LIST` i `payload` z kolekcją zgłoszeń w postaci: 
-    
-    * `issueId` - identyfikator zgłoszenia 
-    
-    * `user` 
-    
-    * `name`  - nazwa uczestnika  
-    
-    * `group` - numer grupy 
-    
-    * `problem` - opis problemu  
-    
-    * `status` - status zgłoszenia 
+  * Do akcji `TRAINER_LOGGED` dodać `payload` z kolekcją zgłoszeń
   
-  * Po wystąpieniu akcji `TRAINER_NEEDED` wysłać kolekcje ze zgłoszeniami do wszystkich trenerów w analogicznej do logowania trenera 
+  * Po wystąpieniu akcji `TRAINER_NEEDED` wysłać do wszystkich trenerów akcji `ISSUES` z `payload` jako wszystkie zgłoszenia
 
 ### Klient: 
+    
+* Dodać obsługę akcji `ISSUES`
 
-* Dodać ekran z listą zgłoszeń 
+  * wywołać funkcję `renderTrainerDashboardView` i przekazać jej `payload`
 
-  * Ekran do wyświetlania potrzebuje listy zgłoszeń 
+* Dodać obsługę akcji `TRAINER_LOGGED`
+
+  * wywołać funkcję `renderTrainerDashboardView` i przekazać jej `payload`
   
-  * Wyświetlić listę w postaci kolumn z wierszami używając `flex-box` 
+* Dodać referencję do elementów o `issueListItem` i `issueList`
+
+  ```javascript
+  const issueListItemTemplate = getNodeById('issueListItem');
+  const issueListNode = getNodeById('issueList');
+  ```
+* Przeiterować się z użyciem `forEach` po argumecie `data`, który jest tablicą zgłoszeń w postaci wysłanej przez serwer
+
+  ```javascript
+  data.forEach(it => {
+    ...
+  });
+  ```
+  * Podczas każdej iteracji tworzyć nowy element na podstawie szablonu `issueListItemTemplate`
+   
+    `const issueListItemNode = document.importNode(issueListItemTemplate.content, true);`
     
-    * W pierwszej kolumnie nazwę uczestnika  
+  * W stworzonym elemencie ustawić zawartość tekstu, nadpisująć zawartość pola `textContent` elementu
+  
+    * `issueListItemNode.querySelector('.issueListItemName').textContent = it.userName;`
+      
+      * Element posiada klasy, dzięki którym można zidentyfikować element do wyświetlenia danach:
+      
+        * `.issueListItemName` - kolumna z nazwą uczestnika
+        
+        * `.issueListItemGroup` - kolumna z grupą uczestnika
+        
+        * `.issueListItemProblem` - kolumna z problemem uczestnika
+        
+        * `.issueListItemStatus` - kolumna ze statusem zgłoszenia
+        
+    * Dodać do parenta
     
-    * W drugiej kolumnie grupę uczestnika 
-    
-    * W trzeciej kolumnie opis problemu  
-    
-    * W czwartej kolumnie status zgłoszenia  
-
-* Dodać w evencie `onmessage` obsługę akcji analogicznie do serwera  
-
-* Dodać do aplikacji obiekt reprezentacyjny stan globalny 
-
-  * Stan na razie zawiera tylko pole `issues` na listę zgłoszeń z wartością inicjalna - pusta lista 
-
-* Po zalogowaniu trenera wyświetlić ekran listy zgłoszeń  
-
-  P* rzekazać do ekranu dane ze stanu globalnego  
-
-* Dodać obsługę akcji `ISSUES` 
-
-  * Zaktualizować listę zgłoszeń w stanie globalnym  
-
+      * `issueListNode.appendChild(issueListItemNode);`
 
 ## 6. Odpowiedź na zgłoszenie  
 

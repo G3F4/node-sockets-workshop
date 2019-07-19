@@ -8,6 +8,7 @@ import {
   State,
   StaticFileExtension,
   User,
+  Event,
 } from './types';
 
 const PORT = process.env.PORT || 5000;
@@ -45,41 +46,46 @@ const state: State = {
 
 const webSocketsServer = new WebSocket.Server({ server });
 
-webSocketsServer.on('connection', socket => {
-  let connectedUser: User | null = null;
+const sendEvent = (socket: WebSocket, event: Event): void => {
+  try {
+    socket.send(JSON.stringify(event));
+  }
+
+  catch (e) {
+    console.error(e);
+  }
+};
+
+webSocketsServer.on('connection', (socket: WebSocket) => {
+  const connectedUser: User = {
+    id: `user-id-${Date.now()}`,
+    data: {
+      name: '',
+      group: '',
+    },
+    socket,
+  };
 
   socket.on('message', message => {
     const { action, payload } = JSON.parse(message.toString());
 
     switch (action as Action) {
       case 'PARTICIPANT_LOGIN': {
-        connectedUser = {
-          id: `participant-id-${Date.now()}`,
-          data: payload,
-          socket,
-        } as User;
-
+        connectedUser.data = payload;
         state.participants = [...state.participants, connectedUser];
 
-        connectedUser.socket.send(JSON.stringify({
-          action: 'PARTICIPANT_LOGGED',
-        }));
+        sendEvent(connectedUser.socket, { action: 'PARTICIPANT_LOGGED' });
 
         break;
       }
       case 'TRAINER_LOGIN': {
-        connectedUser = {
-          id: `trainer-id-${Date.now()}`,
-          data: payload,
-          socket,
-        } as User;
-
+        connectedUser.data = payload;
         state.trainers = [...state.trainers, connectedUser];
 
-        connectedUser.socket.send(JSON.stringify({
+        sendEvent(connectedUser.socket, {
           action: 'TRAINER_LOGGED',
           payload: state.issues,
-        }));
+        });
 
         break;
       }
@@ -92,18 +98,18 @@ webSocketsServer.on('connection', socket => {
           status: 'PENDING',
           userId: connectedUser.id,
           userName: connectedUser.data.name,
-          userGroup: connectedUser.data.group as string,
+          userGroup: connectedUser.data.group,
         }];
 
-        connectedUser.socket.send(JSON.stringify({
-          action: 'ISSUE_RECEIVED',
-        }));
+        connectedUser.socket.send(JSON.stringify({ action: 'ISSUE_RECEIVED' }));
+
+        sendEvent(connectedUser.socket, { action: 'ISSUE_RECEIVED' });
 
         state.trainers.forEach(({ socket }) => {
-          socket.send(JSON.stringify({
+          sendEvent(socket, {
             action: 'ISSUES',
             payload: state.issues,
-          }));
+          });
         });
 
         break;
@@ -117,18 +123,18 @@ webSocketsServer.on('connection', socket => {
 
         if (!participant) break;
 
-        participant.socket.send(JSON.stringify({
+        sendEvent(participant.socket, {
           action: 'ISSUE_TAKEN',
-          payload: connectedUser.data.name,
-        }));
+          payload: connectedUser.data && connectedUser.data.name,
+        });
 
         issue.status = 'TAKEN';
 
         state.trainers.forEach(({ socket }) => {
-          socket.send(JSON.stringify({
+          sendEvent(socket, {
             action: 'ISSUES',
             payload: state.issues,
-          }));
+          });
         });
 
         break;
@@ -199,6 +205,7 @@ webSocketsServer.on('connection', socket => {
       }
     }
   });
+
   socket.on('close', () => {
     state.participants = state.participants.filter(user => user.socket !== socket);
     state.trainers = state.trainers.filter(user => user.socket !== socket);

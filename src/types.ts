@@ -10,20 +10,29 @@ export type FileExtensionToContentTypeMap = {
 
 export type Action = 'PARTICIPANT_LOGIN'
   | 'TRAINER_LOGIN'
+  | 'TRAINER_LOGGED'
+  | 'PARTICIPANT_LOGGED'
   | 'TRAINER_NEEDED'
+  | 'ISSUE_RECEIVED'
   | 'ISSUE_TAKEN'
   | 'ISSUE_SOLVED'
   | 'HINT_SENT'
   | 'HINT_FAIL'
+  | 'ISSUES'
 ;
 
 export type IssueStatus = 'PENDING' | 'TAKEN' | 'SOLVED' | 'HINT';
+
+export interface Event {
+  action: Action;
+  payload?: any;
+}
 
 export interface User {
   id: string;
   data: {
     name: string;
-    group?: string;
+    group: string;
   };
   socket: WebSocket;
 }

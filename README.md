@@ -1,66 +1,71 @@
 # warsawjs-workshop-34-trainer-needed
 
-## 1. Serwer http `Hello world` 
+## 1. Serwer http z plikami statycznymi
 
-* Utworzyć folder `src` w głównym folderze projektu 
+Do rozpoczęcia pracy potrzebny jest serwer obsługujący protokuł http. 
+Dodać prosty serwer serwujący pliku statyczne z folderu `public`.
 
-* Dodać plik `index.ts` w folderze `/src` 
+* `src/index.ts`
 
-  * Utworzyć serwer przy wykorzystaniu funkcji `createServer` ze wbudowanego modułu `http` 
-
-    * Jako pierwszy argument przekazać pusty obiekt z opcjami serwera 
-
-    * Jako drugi, handler serwera w postaci funkcji 
-
-      * Handler serwera w odpowiedzi na wszystkie zapytania zwraca tekst `Test server` 
-
-  * Ustawić nasłuchiwanie na port `3000` 
-
-## 2. Pliki statyczne  
-
-* Modyfikacja handlera serwera, tak aby zwracał pliki statyczne 
-
-  * Odczytanie do stałej (`const`) o nazwie `url` adresu `URL` z obiektu zapytania (zazwyczaj nazywany `req`, pierwszy argument wywołania handlera) wykorzystując atrybut obiektu zapytania `req.url` 
-
-  * Rozbicie adresu `URL` na ścieżkę do pliku oraz jego rozszerzenie (potrzebne do ustawienia headera `Content-Type`) i zapisanie do stałej `urlParts` wykorzystując metodę `split` stringa z argumentem `.` (zakładamy optymistycznie że w adresie `URL` nie ma znaku kropki) 
-
-  * Utworznie stałej przechowujacej rozszerznie pliku o nazwie `fileExtension` 
-
-  * Utworznie zmiennej na wartość headera `Content-Type` o nazwie `contentType` 
-
-  * Utworznie `switch` operujący na `fileExtension` 
-
-    * Dla plików `html` ustawia wartość `contentType` na `html/css` 
-
-    * Dla plików `css` ustawia wartość `contentType` na `text/css` 
-
-    * Dla plików `js` ustawia wartość `contentType` na `text/javascript` 
-
-  * Wczytanie pliku 
-
-    * Wykorzystać funckje `readFileSync` ze wbudowanego modułu `fs`  
-
-      * Jako pierwszy argument przekazać absolutną ścieżkę do pliku 
-
-        * Do pobrania ścieżki projektu możesz skorzystać z `proces.cwd()` 
-
-      * Drugi argument to typ kodowania pliku  
-
-        * Ustawić `utf-8` 
-
-  * Ustawić status odpowiedzi wykorzystując metodę `writeHead` obiektu odpowiedzi (drugi argument handlera, zazwyczaj nazywany `res`) 
-
-    * Jako pierwszy argument przekazać status odpowiedzi na `200` 
-
-    * Jako drugi argument przekazać obiekt zawierający definicje nagłówków w notacji zgodnej ze standardem `HTTP` 
-
-  * Wykorzystując metodę `end` obiektu odpowiedzi (`res`) zakończyć zapytanie przekazując do metody zawartość czytanego pliku  
-
-  * Owrapować kod zawarty do tej pory w handlarze blokiem `try/catch` 
-
-    * W przypadku nie powodzenia wczytywania pliki zwracamy komunikat błędu w postaci statycznego tekstu  
-
-## 3. Dodanie WebSocketów 
+  * Hello world serwera http
+  
+    * Utworzyć serwer przy wykorzystaniu funkcji `createServer` ze wbudowanego modułu `http` 
+  
+      * Zapisać do stałej `server`
+        
+      * Przekazać handler serwera w postaci funkcji `(request, response) => {...}`
+  
+        * Dodać blok `try catch`, który obejmie cały kod handlera
+          
+          * w przypadku błędu wyświetlić błąd do konsoli
+          
+          * wysłać odpowiedź w postać `e.toString()` gdzie `e` to wyłapany błąd przez `catch`
+        
+        * Handler serwera w odpowiedzi na wszystkie zapytania zwraca tekst `Test server` 
+        
+          * Wykorzystać metodę `end` obiektu `response`
+  
+    * Dodać nasłuchiwanie wykorzystując metodę `listen` obiektu `server`
+      
+      * Przekazać jako pierwszy argument stałą `PORT`
+      
+      * Jako drugi funkcję, która wywoła się po uruchomieniu serwera
+      
+        * Użyć `console.log` aby sprawdzić czy serwer rozpoczął nasłuchiwanie na porcie
+  
+  * Modyfikacja handlera serwera, tak aby zwracał pliki statyczne 
+  
+    * Zapisać do stałej `url` adres URL z obiektu zapytania wykorzystując `request.url` 
+    
+      * W przypadku gdy adres jest równy `/` ustawić wartość `index.html`
+      
+        * Wykorzystać operator `? :`
+        
+    * Utworznie stałej `urlParts` z wartością `url.split('.')`
+  
+    * Utworznie stałej `fileExtension` z wartością ostatniego elementu tablicy `urlParts`
+    
+    * Utworznie stałej `contentType` z wartością z mapy `FILE_EXTENSION_TO_CONTENT_TYPE`, której kluczami są rozszerzenia plików
+  
+    * Ustawić status odpowiedzi wykorzystując metodę `writeHead` obiektu odpowiedzi (drugi argument handlera, zazwyczaj nazywany `res`) 
+  
+      * Jako pierwszy argument przekazać status odpowiedzi równy `200` 
+  
+      * Jako drugi argument przekazać obiekt `{ 'Content-Type': contentType }`
+  
+    * Wczytanie pliku 
+  
+      * Wykorzystać funckje `readFileSync` ze wbudowanego modułu `fs`  
+        
+        * Zapisać do stałej `file`
+  
+        * Jako pierwszy argument przekazać absolutną ścieżkę do pliku 
+  
+          * Do pobrania ścieżki projektu możesz skorzystać z `proces.cwd()` 
+  
+    * Wykorzystując metodę `response.end` zakończyć zapytanie przekazując do metody zawartość wczytanego pliku  
+  
+## 2. Dodanie WebSocketów 
 
 ### Serwer: (`/src/index.ts`) 
 
@@ -116,7 +121,7 @@
 
         * W reakcji na zdarzenie wypisać do konsoli informację o przerwaniu połączenia z serwerem  
 
-## 4. Autentykacja użytkownika 
+## 3. Autentykacja użytkownika 
 
 ### Klient: 
 
@@ -226,7 +231,7 @@ Obsługa eventu logowania
         
         * Wysłać akcję `TRAINER_LOGGED` z pustym `payload` 
 
-## 5. Wysyłanie sygnału pomocy 
+## 4. Wysyłanie sygnału pomocy 
 
 ### Klient: 
 
@@ -260,7 +265,7 @@ Obsługa eventu logowania
   
   * Wysłać do użytkownika wiadomość o przyjęciu zgłoszenia  
 
-## 6. Wyświetlanie zgłoszeń  
+## 5. Wyświetlanie zgłoszeń  
 
 ### Serwer 
 
@@ -313,7 +318,7 @@ Obsługa eventu logowania
   * Zaktualizować listę zgłoszeń w stanie globalnym  
 
 
-## 7. Odpowiedź na zgłoszenie  
+## 6. Odpowiedź na zgłoszenie  
 
 ### Klient: 
 
@@ -335,7 +340,7 @@ Obsługa eventu logowania
 
   * Wysłać akcje `ISSUE_LIST` do wszystkich trenerów 
 
-## 8. Trener w drodze 
+## 7. Trener w drodze 
 
 ### Serwer: 
 
@@ -364,7 +369,7 @@ Obsługa eventu logowania
   * Zmienić na ekran zgłoszenia uczestnika  
 
 
-## 9. Problem rozwiązany  
+## 8. Problem rozwiązany  
 
 ### Klient: 
 
@@ -389,7 +394,7 @@ Obsługa eventu logowania
   * Wykorzystać identyfikator  z `payload` do odnalezienia zgłoszenia i aktualizacji statusu zgłoszenia na `SOLVED` 
 
 
-## 10. Pomoc przez wiadomość  
+## 9. Pomoc przez wiadomość  
 
 ### Klient: 
 

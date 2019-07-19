@@ -1,13 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
   const renderTemplateById = id => {
-    const rootNode = getElementById('root');
-    const template = getElementById(id);
+    const rootNode = getNodeById('root');
+    const template = getNodeById(id);
     const node = template.content.cloneNode(true);
 
     rootNode.innerHTML = '';
     rootNode.appendChild(node);
   };
-  const getElementById = id => getElementById(id);
+  const getNodeById = id => document.getElementById(id);
   const renderLandingView = () => {
     renderTemplateById('landing');
   };

@@ -69,29 +69,24 @@ Dodać prosty serwer serwujący pliku statyczne z folderu `public`.
 
 ### Serwer: (`/src/index.ts`) 
 
-* Zainstalować pakiet `ws`, który posłuży do obsługi połączenia w technologii `WebSockets` 
+* `index.ts`
 
-* W pliku `index.ts` zaimportować klasę `Server` z pakietu `ws` 
+  * Utworzyć nową instancję serwera `new Server` o nazwie `webSocketsServer` 
+  
+    * Przekazać do konstruktora obiekt konfiguracyjny z kluczem `server`, wskazujący na referencje do serwera HTTP 
+  
+  * Dodać do serwera WebSockets nasłuchiwanie na `event` połączenia o nazwie `connection` przy wykorzystaniu metody `on` 
+  
+    * Klasa `Server` z pakietu `ws` dziedziczy do klasie `EventEmmiter` 
+  
+    * Handler eventu `connection` jako argument wywołania dostaje socket, który reprezentuje połączenie z klientem 
+  
+    * Handler w reakcji na event połączenia odsyła wiadomość powitalną `connected to socket server` wykorzystując metodę `send` 
+  
+  * Dodać do serwera `WebSockets` nasłuchiwanie na `event` połączenia o nazwie `message` przy wykorzystaniu metody `on` 
+  
+    * W reakcji na zdarzenie wypisać do konsoli dane eventu dostępne w polu `data` 
 
-* Utworzyć nową instancję serwera `ws` o nazwie `webSocketsServer` 
-
-  * Przekazać do konstruktora obiekt konfiguracyjny z kluczem `server`, wskazujący na referencje do serwera `HTTP` 
-
-* Dodać do serwera `WebSockets` nasłuchiwanie na `event` połączenia o nazwie `connection` przy wykorzystaniu metody `on` 
-
-  * Klasa `Server` z pakietu `ws` dziedziczy do klasie `EventEmmiter` 
-
-  * Handler eventu `connection` jako argument wywołania dostaje socket, który reprezentuje połączenie z klientem 
-
-  * Handler w reakcji na event połączenia odsyła wiadomość powitalną `connected to socket server` wykorzystując metodę `send` 
-
-    * Jako argument przekazujemy `string` albo `Buffer` 
-
-* Dodać do serwera `WebSockets` nasłuchiwanie na `event` połączenia o nazwie `message` przy wykorzystaniu metody `on` 
-
-  * W reakcji na zdarzenie wypisać do konsoli dane eventu dostępne w polu `data` 
-
- 
 
 ### Klient: (`/public/client.js`) 
 

@@ -38,6 +38,18 @@ const server = http.createServer( (request, response) => {
   }
 });
 
+const webSocketsServer = new WebSocket.Server({ server });
+
+webSocketsServer.on('connection', (socket: WebSocket) => {
+  socket.on('message', message => {
+    console.log(['socket message'], message);
+  });
+
+  socket.on('close', () => {
+    console.log('socket closed');
+  });
+});
+
 server.listen(PORT, () => {
   console.info(`server started on port ${PORT}`);
 });

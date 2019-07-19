@@ -313,7 +313,7 @@ switch (action) {
   
   * W odpowiedzi na event dodać nowy element do kolekcji zgłoszeń  
   
-  * Wysłać do użytkownika wiadomość o przyjęciu zgłoszenia  
+  * Wysłać do użytkownika event z akcją `ISSUE_RECEIVED` i pustym `payload`
 
 ## 5. Wyświetlanie zgłoszeń  
 

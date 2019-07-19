@@ -46,35 +46,37 @@ const state: State = {
 const webSocketsServer = new WebSocket.Server({ server });
 
 webSocketsServer.on('connection', socket => {
+  let connectedUser: User | null = null;
+
   socket.on('message', message => {
     const { action, payload } = JSON.parse(message.toString());
 
     switch (action as Action) {
       case 'PARTICIPANT_LOGIN': {
-        const user = {
+        connectedUser = {
           id: `participant-id-${Date.now()}`,
           data: payload,
           socket,
         } as User;
 
-        state.participants = [...state.participants, user];
+        state.participants = [...state.participants, connectedUser];
 
-        user.socket.send(JSON.stringify({
+        connectedUser.socket.send(JSON.stringify({
           action: 'PARTICIPANT_LOGGED',
         }));
 
         break;
       }
       case 'TRAINER_LOGIN': {
-        const user = {
+        connectedUser = {
           id: `trainer-id-${Date.now()}`,
           data: payload,
           socket,
         } as User;
 
-        state.trainers = [...state.trainers, user];
+        state.trainers = [...state.trainers, connectedUser];
 
-        user.socket.send(JSON.stringify({
+        connectedUser.socket.send(JSON.stringify({
           action: 'TRAINER_LOGGED',
           payload: state.issues,
         }));
@@ -82,20 +84,18 @@ webSocketsServer.on('connection', socket => {
         break;
       }
       case 'TRAINER_NEEDED': {
-        const user = state.participants.find(it => it.socket === socket);
-
-        if (!user) break;
+        if (!connectedUser) break;
 
         state.issues = [...state.issues, {
           id: `issue-id-${Date.now()}`,
           problem: payload.problem,
           status: 'PENDING',
-          userId: user.id,
-          userName: user.data.name,
-          userGroup: user.data.group as string,
+          userId: connectedUser.id,
+          userName: connectedUser.data.name,
+          userGroup: connectedUser.data.group as string,
         }];
 
-        user.socket.send(JSON.stringify({
+        connectedUser.socket.send(JSON.stringify({
           action: 'ISSUE_RECEIVED',
         }));
 
@@ -110,9 +110,8 @@ webSocketsServer.on('connection', socket => {
       }
       case 'ISSUE_TAKEN': {
         const issue = state.issues.find(it => it.id === payload);
-        const trainer = state.trainers.find(it => it.socket === socket);
 
-        if (!issue || !trainer) break;
+        if (!issue || !connectedUser) break;
 
         const participant = state.participants.find(it => it.id === issue.userId);
 
@@ -120,7 +119,7 @@ webSocketsServer.on('connection', socket => {
 
         participant.socket.send(JSON.stringify({
           action: 'ISSUE_TAKEN',
-          payload: trainer.data.name,
+          payload: connectedUser.data.name,
         }));
 
         issue.status = 'TAKEN';
@@ -135,11 +134,9 @@ webSocketsServer.on('connection', socket => {
         break;
       }
       case 'ISSUE_SOLVED': {
-        const participant = state.participants.find(it => it.socket === socket);
+        if (!connectedUser) break;
 
-        if (!participant) break;
-
-        const issue = state.issues.find(it => it.userId === participant.id);
+        const issue = state.issues.find(it => it.userId === connectedUser.id);
 
         if (!issue) break;
 
@@ -180,11 +177,9 @@ webSocketsServer.on('connection', socket => {
         break;
       }
       case 'HINT_FAIL': {
-        const participant = state.participants.find(it => it.socket === socket);
+        if (!connectedUser) break;
 
-        if (!participant) break;
-
-        const issue = state.issues.find(it => it.userId === participant.id);
+        const issue = state.issues.find(it => it.userId === connectedUser.id);
 
         if (!issue) break;
 

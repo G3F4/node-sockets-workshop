@@ -114,7 +114,7 @@ webSocketsServer.on('connection', (socket: WebSocket) => {
         break;
       }
       case 'ISSUE_TAKEN': {
-        const issue = state.issues.find(it => it.id === payload);
+        const issue = state.issues.find(it => it.id === payload && it.status !== 'SOLVED');
 
         if (!issue) break;
 
@@ -139,17 +139,17 @@ webSocketsServer.on('connection', (socket: WebSocket) => {
         break;
       }
       case 'ISSUE_SOLVED': {
-        const issue = state.issues.find(it => it.userId === connectedUser.id);
+        const issue = state.issues.find(it => it.userId === connectedUser.id && it.status !== 'SOLVED');
 
         if (!issue) break;
 
         issue.status = 'SOLVED';
 
         state.trainers.forEach(({ socket }) => {
-          socket.send(JSON.stringify({
+          sendEvent(socket, {
             action: 'ISSUES',
             payload: state.issues,
-          }));
+          });
         });
 
         break;

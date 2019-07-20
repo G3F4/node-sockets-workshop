@@ -1,14 +1,14 @@
 # warsawjs-workshop-34-trainer-needed
 
-## WebSockets vs HTTP
-
-### Jak wygląda komunikacja WebSockets
-![alt text](https://www.pubnub.com/wp-content/uploads/2014/09/WebSockets-Diagram.png)
-©: https://www.pubnub.com/
+## HTTP vs. WebSockets
 
 ### Jak wygląda komunikacja HTTP
 ![alt text](https://res.cloudinary.com/di2vaxvhl/image/upload/v1545849277/HTTP_txch7g.png)
 ©: https://res.cloudinary.com/
+
+### Jak wygląda komunikacja WebSockets
+![alt text](https://www.pubnub.com/wp-content/uploads/2014/09/WebSockets-Diagram.png)
+©: https://www.pubnub.com/
 
 ## 0. Przygotowanie do warszatatów
 

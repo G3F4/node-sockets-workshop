@@ -68,6 +68,8 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   const renderIssueTakenView = trainerName => {
     renderTemplateById('issueTaken');
+
+    getNodeById('issueTakenHeader').textContent = `Trener ${trainerName} przyjął Twoje zgłoszenie, zaraz podejdzie.`;
   };
   const renderHintReceivedView = hint => {
     renderTemplateById('hintReceived');
@@ -142,6 +144,10 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       case 'ISSUE_RECEIVED': {
         renderIssueReceivedView();
+        break;
+      }
+      case 'ISSUE_TAKEN': {
+        renderIssueTakenView(payload);
         break;
       }
       case 'ISSUES': {

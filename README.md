@@ -372,6 +372,8 @@ switch (action) {
 
 ## 6. Odpowiedź na zgłoszenie  
 
+Dodać obsługę przyjęcia zgłoszenia przez trenera.
+
 ### Klient: 
 
 * Na ekranie listy zgłoszeń, podczas iteracji po zgłoszenia
@@ -391,6 +393,14 @@ switch (action) {
     * dla `default`:
     
       * do elementu `takeIssueButtonNode` dodać klasę `hide' wykorzystując `.classList.add('hide')`
+      
+  * Dodać obsługę akcji `ISSUE_TAKEN`
+  
+    * Wyświetlić ekran informujący o przyjęciu zgłoszenia
+    
+      * Wywołać funkcję `renderIssueTakenView` i przekazać `payload`
+      
+        * Znaleźć element o `id="issueTakenHeader"` i ustawić wartość pola `textContent` na `Trener ${trainerName} przyjął Twoje zgłoszenie, zaraz podejdzie.`
 
 ### Serwer: 
 
@@ -407,6 +417,10 @@ switch (action) {
     * Jeśli się nie udało przerwać `switch`
   
       * `if (!participant) break;`
+      
+  * Wysłać do uczestnika akcję `ISSUE_TAKEN`
+    
+    * Jako `payload` ustawić nazwę trenera dostępną w `connectedUser.data.name`
 
   * Zmienić status zgłoszenia na `TAKEN` 
   
@@ -414,36 +428,8 @@ switch (action) {
 
   * Wysłać akcje `ISSUES` do wszystkich trenerów z nową listą zgłoszeń
 
-## 7. Trener w drodze 
 
-### Serwer: 
-
-* Dodać do obsługi akcji `ISSUE_TAKEN` wysyłanie akcji `TRAINER_ON_WAY` z `payload` z wartością nazwy trenera, który odebrał zgłoszenie do uczestnika, który zgłosił problem  
-
-### Klient: 
-
-* Dodać do stanu globalnego pole `myIssue` reprezentujące zgłoszenie w postaci: 
-
-  * `status` - status zgłoszenia  
-  
-  * `trainerName` - nazwa trenera, który przyjął zgłoszenie 
-
-  * Inicjalnie pole ma wartość `null` 
-
-* Dodać ekran zgłoszenia uczestnika 
-
-  * Po utworzeniu zgloszenia ekran prezentuje tekst `Oczekiwanie na przyjęcie zgłoszenia` - `status` zgłoszenia ma wartość `RECEIVED` 
-
-  * Dla statusu `TRAINER_ON_WAY` wyświetlić tekst `Traner Xxx jest w drodze do Ciebie` 
-
-* Po wysłaniu zgłoszenia: 
-
-  * Ustawić dane w stanie globalnym 
-
-  * Zmienić na ekran zgłoszenia uczestnika  
-
-
-## 8. Problem rozwiązany  
+## 7. Problem rozwiązany  
 
 ### Klient: 
 
@@ -468,7 +454,7 @@ switch (action) {
   * Wykorzystać identyfikator  z `payload` do odnalezienia zgłoszenia i aktualizacji statusu zgłoszenia na `SOLVED` 
 
 
-## 9. Pomoc przez wiadomość  
+## 8. Pomoc przez wiadomość  
 
 ### Klient: 
 

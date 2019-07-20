@@ -78,6 +78,17 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   const renderHintReceivedView = hint => {
     renderTemplateById('hintReceived');
+
+    getNodeById('hintSuccess').addEventListener('click', () => {
+      sendEvent({ action: 'ISSUE_SOLVED' });
+      renderIssueSubmitView();
+    });
+    getNodeById('hintFail').addEventListener('click', () => {
+      sendEvent({ action: 'HINT_FAIL' });
+      renderIssueReceivedView();
+    });
+
+    getNodeById('hint').textContent = hint;
   };
   const renderTrainerDashboardView = data => {
     renderTemplateById('trainerDashboard');
@@ -88,12 +99,27 @@ document.addEventListener('DOMContentLoaded', () => {
     data.forEach(it => {
       const issueListItemNode = document.importNode(issueListItemTemplate.content, true);
       const takeIssueButtonNode = issueListItemNode.querySelector('.issueListItemActions button');
+      const issueListHintFormNode = issueListItemNode.querySelector('.issueListHintForm');
 
       issueListItemNode.querySelector('.issueListItemName').textContent = it.userName;
       issueListItemNode.querySelector('.issueListItemGroup').textContent = it.userGroup;
       issueListItemNode.querySelector('.issueListItemProblem').textContent = it.problem;
       issueListItemNode.querySelector('.issueListItemStatus').textContent = it.status;
       issueListNode.appendChild(issueListItemNode);
+
+      issueListHintFormNode.addEventListener('submit', event => {
+        event.preventDefault();
+
+        const formData = new FormData(event.target);
+
+        sendEvent({
+          action: 'HINT_SENT',
+          payload: {
+            hint: formData.get('hint'),
+            userId: it.userId,
+          },
+        });
+      });
 
       switch (it.status) {
         case 'PENDING': {
@@ -104,10 +130,18 @@ document.addEventListener('DOMContentLoaded', () => {
             });
           });
 
+          issueListHintFormNode.classList.add('hide');
+
+          break;
+        }
+        case 'TAKEN': {
+          takeIssueButtonNode.classList.add('hide');
+
           break;
         }
         default: {
           takeIssueButtonNode.classList.add('hide');
+          issueListHintFormNode.classList.add('hide')
         }
       }
     });
@@ -157,6 +191,10 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       case 'ISSUES': {
         renderTrainerDashboardView(payload);
+        break;
+      }
+      case 'HINT_RECEIVED': {
+        renderHintReceivedView(payload);
         break;
       }
     }

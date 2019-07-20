@@ -114,7 +114,7 @@ webSocketsServer.on('connection', (socket: WebSocket) => {
         break;
       }
       case 'ISSUE_TAKEN': {
-        const issue = state.issues.find(it => it.id === payload);
+        const issue = state.issues.find(it => it.id === payload && it.status !== 'SOLVED');
 
         if (!issue) break;
 
@@ -139,11 +139,52 @@ webSocketsServer.on('connection', (socket: WebSocket) => {
         break;
       }
       case 'ISSUE_SOLVED': {
-        const issue = state.issues.find(it => it.userId === connectedUser.id);
+        const issue = state.issues.find(it => it.userId === connectedUser.id && it.status !== 'SOLVED');
 
         if (!issue) break;
 
         issue.status = 'SOLVED';
+
+        state.trainers.forEach(({ socket }) => {
+          socket.send(JSON.stringify({
+            action: 'ISSUES',
+            payload: state.issues,
+          }));
+        });
+
+        break;
+      }
+      case 'HINT_SENT': {
+        const participant = state.participants.find(it => it.id === payload.userId);
+
+        if (!participant) break;
+
+        const issue = state.issues.find(it => it.userId === participant.id && it.status !== 'SOLVED');
+
+        if (!issue) break;
+
+        participant.socket.send(JSON.stringify({
+          action: 'HINT_RECEIVED',
+          payload: payload.hint,
+        }));
+
+        issue.status = 'HINT';
+
+        state.trainers.forEach(({ socket }) => {
+          socket.send(JSON.stringify({
+            action: 'ISSUES',
+            payload: state.issues,
+          }));
+        });
+
+        break;
+      }
+      case 'HINT_FAIL': {
+        const issue = state.issues.find(it => it.userId === connectedUser.id && it.status !== 'SOLVED');
+
+        if (!issue) break;
+
+        issue.status = 'PENDING';
 
         state.trainers.forEach(({ socket }) => {
           socket.send(JSON.stringify({

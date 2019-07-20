@@ -460,9 +460,7 @@ Obsłużyć rozwiązanie problemu.
 
 ### Klient: 
 
-* Dodać do stanu globalnego pole `hint` o wartości inicjalnej `null` 
-
-* Dodać obsługę akcji `HINT`  
+* Dodać obsługę akcji `HINT_RECEIVED`  
 
   * Ustawić wartość `payload` wartości pola `hint` w stanie globalnym  
 

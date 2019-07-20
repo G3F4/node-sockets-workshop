@@ -1,5 +1,16 @@
 # warsawjs-workshop-34-trainer-needed
 
+## 0. Przygotowanie do warszatatów:
+
+  * Sklonuj repozytorium
+  
+  * Zainstalouj zależności 
+  
+    * `yarn` albo `npm i`
+    
+  * Zmień branch na `etap-0`
+
+
 ## 1. Serwer http z plikami statycznymi
 
 Do rozpoczęcia pracy potrzebny jest serwer obsługujący protokuł http. 
@@ -63,6 +74,10 @@ Dodać prosty serwer serwujący pliku statyczne z folderu `public`.
 
   * Wykorzystując metodę `response.end` zakończyć zapytanie przekazując do metody zawartość wczytanego pliku  
   
+  
+[Rozwiązanie](https://github.com/G3F4/warsawjs-workshop-34-trainer-needed/compare/etap-0...etap-1?expand=1)
+  
+  
 ## 2. Dodanie WebSocketów 
 
 Ustanowić stałe połaączenie pomiędzy klientem a serwerem wykorzystując WebSockety
@@ -117,6 +132,10 @@ Ustanowić stałe połaączenie pomiędzy klientem a serwerem wykorzystując Web
     * `onclose` - wywoływany w sytuacji kiedy serwer zakończy połączenie z socketem 
 
       * W reakcji na event: `console.log(['WebSocket.onclose'], event);`  
+
+
+[Rozwiązanie](https://github.com/G3F4/warsawjs-workshop-34-trainer-needed/compare/etap-1...etap-2?expand=1)
+
 
 ## 3. Autentykacja użytkownika 
 
@@ -264,6 +283,10 @@ const connectedUser: User = {
         
         * Wysłać akcję `TRAINER_LOGGED` z pustym `payload` 
 
+
+[Rozwiązanie](https://github.com/G3F4/warsawjs-workshop-34-trainer-needed/compare/etap-2...etap-3?expand=1)
+
+
 ## 4. Wysyłanie sygnału pomocy 
 
 ### Klient: 
@@ -314,6 +337,10 @@ switch (action) {
   * W odpowiedzi na event dodać nowy element do kolekcji zgłoszeń  
   
   * Wysłać do użytkownika event z akcją `ISSUE_RECEIVED` i pustym `payload`
+
+
+[Rozwiązanie](https://github.com/G3F4/warsawjs-workshop-34-trainer-needed/compare/etap-3...etap-4?expand=1)
+
 
 ## 5. Wyświetlanie zgłoszeń  
 
@@ -370,6 +397,10 @@ switch (action) {
     
       * `issueListNode.appendChild(issueListItemNode);`
 
+
+[Rozwiązanie](https://github.com/G3F4/warsawjs-workshop-34-trainer-needed/compare/etap-4...etap-5?expand=1)
+
+
 ## 6. Przyjęcie zgłoszenia
 
 Dodać obsługę przyjęcia zgłoszenia przez trenera.
@@ -400,7 +431,11 @@ Dodać obsługę przyjęcia zgłoszenia przez trenera.
 * Dodać obsługę akcji `ISSUE_TAKEN`
 
   * Znaleźć w kolekcji zgłoszenie wykorzystując `payload` zawierający identyfikator zgłoszenia i zapisać do stałej `issue`
-  
+    
+    * `userId` zgłoszenia równe `payload`
+        
+    * `status` różne od `SOLVED`
+   
     * Jeśli się nie udało przerwać `switch`
   
       * `if (!issue) break;`
@@ -411,82 +446,168 @@ Dodać obsługę przyjęcia zgłoszenia przez trenera.
 
   * Wysłać akcje `ISSUES` do wszystkich trenerów z nową listą zgłoszeń
 
+
+[Rozwiązanie](https://github.com/G3F4/warsawjs-workshop-34-trainer-needed/compare/etap-5...etap-6?expand=1)
+
+
 ## 7. Problem rozwiązany  
 
-### Klient: 
-
-* Dodać obsługę akcji `ISSUE_RECEIVED` 
-
-  * Zawartość `payload` ustawić jako wartość pola `issueId` 
-
-* Dodać na ekranie zgłoszenia przycisk `Problem rozwiązany`  
-
-  * Po kliknięciu wysłać event z akcją `ISSUE_SOLVED` z `payload` z wartością `issueId`  
-
-  * Zmienić na ekran zgłaszania problemu  
+Obsłużyć rozwiązanie problemu.
 
 ### Serwer: 
 
-* W akcji `ISSUE_TAKEN`
+* Dodać do akcji `ISSUE_TAKEN` odesłanie do użytkownika eventu z przyjęciem zgłoszenia
 
-  * Znaleźć w uczestnika wykorzystując obiekt zgłoszenia zawierający identyfikator uczestnika `issue.userId` i zapisać do stałej `partcipant`
+  * Znaleźć użytkownika wykorzystując `issue.userId` i zapisać do stałej `participant`
   
-    * Jeśli się nie udało przerwać `switch`
+  * Jeśli nie znaleziono użytkownika przerwać `swtich` przy użyciu `break`
   
-      * `if (!participant) break;`
-      
-  * Wysłać do uczestnika akcję `ISSUE_TAKEN`
+  * Wysłać do znalezionego użytkownika event z akcją `ISSUE_TAKEN` i `payload` zawierającym nazwę trenera, który przyjął zgłoszenie `connectedUser.data.name`
+   
+
+### Klient: 
+
+* Dodać obsługę akcji `ISSUE_TAKEN` 
+
+  * Wywołać `renderIssueTakenView` z `payload` zawierającym nazwę trenera, który przyjął zgłoszenie
+
+* Dodać na ekranie przyjętego zgłoszenia (`renderIssueTakenView`) 
+
+  * Znaleźć element o `id="issueTakenHeader"`
+  
+    * Ustawić pole `textContent` na `Trener ${trainerName} przyjął Twoje zgłoszenie, zaraz podejdzie.`
+
+  * Dodać nasłuchiwanie na kliknięcie w przycisk `Problem rozwiązany`
+
+    * Po kliknięciu wysłać event z akcją `ISSUE_SOLVED` z `payload` bez `payload`
+
+  * Zmienić na ekran zgłaszania problemu (`renderIssueSubmitView`)
+
+
+### Serwer: 
+
+  * Dodać obsługę akcji `ISSUE_SOLVED`
+  
+    * Akcja działa analogicznie do akcji `ISSUE_TAKEN` z tymi różnicami:
     
-    * Jako `payload` ustawić nazwę trenera dostępną w `connectedUser.data.name`
+      * Nie wysyłamy żadnego eventu do uczestnika, którego dotyczyło zgłoszenie
+      
+      * Status zgłoszenia zmienić na `SOLVED`
 
-* Po przyjęciu zgłoszenia odesłać akcje `ISSUE_RECEIVED` z `payload` z wartością identyfikatora utworzonego zgłoszenia 
 
-  * Dodać obsługę akcji `ISSUE_SOLVED` 
-  
-  * Wykorzystać identyfikator  z `payload` do odnalezienia zgłoszenia i aktualizacji statusu zgłoszenia na `SOLVED` 
+[Rozwiązanie](https://github.com/G3F4/warsawjs-workshop-34-trainer-needed/compare/etap-6...etap-7?expand=1)
 
 
 ## 8. Pomoc przez wiadomość  
 
 ### Klient: 
 
-* Dodać do stanu globalnego pole `hint` o wartości inicjalnej `null` 
+* Na ekranie trenera, podczas iteracji po zgłoszeniach dodać referencję do formularza ze wskazówką
 
-* Dodać obsługę akcji `HINT`  
-
-  * Ustawić wartość `payload` wartości pola `hint` w stanie globalnym  
-
-* Na ekranie zgłoszenia jeśli `hint` nie jest puste wyświetlić: 
-
-  * Wiadomość od trenera  
+  * `const issueListHintFormNode = issueListItemNode.querySelector('.issueListHintForm');`
   
-  * Przyciski: 
+  * Dodać na formularzu nasłuchiwanie na event `submit`
   
-    * `Pomogło` 
-      
-      * Po kliknięciu wysyłać akcje `ISSUE_SOLVED` 
-      
-      * Wyświetlić ekran zgłaszania problemu 
-      
-      * Ustawić wartość pola `hint` na `null` 
-      
-    * `Nie pomogło` 
+    * Zablokować domyśle zachowanie eventu
     
-      * Po kliknięciu wysłać akcję `HINT_FAIL` z `payload` z wartością `issueId` 
+      * `event.preventDefault();`
       
-      * Ustawić wartość pola `hint` na `null` 
+    * Zebrać dane z formularza
+      
+      * `const formData = new FormData(event.target);`
+      
+    * Wysłać event z akcją `HINT_SENT` i `payload` w postaci:
+    
+      * `hint` - wartość z pola formularza `hint`
+      
+      * `userId` - identyfikator użytkowanika (`it.userId`)
+      
+  * Zadbać o ukrywanie formularza gdy status równy `TAKEN`
+  
+    * Dodać nowy `case` dla statusu o wartości `TAKEN`
+    
+    * Ukryć element formularza dodając do niego klasę `hide`
+    
+  * Ukryć formularz domyślnie oraz kiedy status zgłoszenia równy `PENDING`
+  
+### Server:
 
-* Rozszerzyć strukturę reprezentującą zgłoszeniu na liście o pole `hint` 
+* Dodać obsługę akcji `HINT_SENT`
 
-* Na ekranie listy zgłoszeń dodać szósta kolumnę z `textarea` na opis rozwiązania problemu oraz przycisk `wyślij` 
+  * Znaleźć uczestnika wykorzystująć `payload.userId`
+  
+    * Jeśli nie znaleziono przerwać `switch`
+    
+  * Znaleźć aktywne zgłoszenie uczestnika
+  
+    * `userId` zgłoszenia równe `participant.id`
+    
+    * `status` różne od `SOLVED`
+    
+    * Jeśli nie znaleziono przerwać `switch`
+    
+  * Wysłać do uczestnika event z akcją `HINT_REVIED` i `payload` równym `payload.id`
+  
+  * Zmienić status zgłoszenia na `HINT`
+  
+  * Wysłać do wszystkich trenerów zmienioną listę zgłoszeń
+  
+### Klient:
 
-  * Po kliknięciu wysłać event z akcją `HINT` z `payload` z wartością `textarea` 
+* Dodać obsługę akcji `HINT_RECEIVED`
 
-Serwer: 
+  * Wyświetlić ekran podpowiedzi (`renderHintReceivedView`)
+  
+    * Przekazać `payload` do ekranu
+    
+  * Na ekranie podpowiedzi
+  
+    * Wyświetlić treść podpowiedzi dostępnej w argumencie funkcji ekranu `hint`
+    
+      * Znaleźć element o `id="hint"` i ustawić `textContent` na zawartość podpowiedzi
+  
+    * Dodać nasłuchiwanie na kliknięcie na element o `id="hintSuccess"`
+    
+      * Wysłać event z akcją `ISSUE_SOLVED`
+      
+      * Wyświetlić ekran zgłaszania (`renderIssueReceivedView`)
+  
+    * Dodać nasłuchiwanie na kliknięcie na element o `id="hintFail"`
+    
+      * Wysłać event z akcją `HINT_FAIL`
+      
+      * Wyświetlić ekran oczekiwania na trenera (`renderIssueReceivedView`)
+      
+### Serwer:
 
-* Dodać obsługę akcji `HINT` 
+* Dodać obsługę akcji `HINT_FAIL`
 
-* Dodać obsługę akcji `HINT_FAIL` 
+  * Znaleźć aktywne zgłoszenie uczestnika
+  
+    * `userId` zgłoszenia równe `connectedUser.id`
+    
+    * `status` różne od `SOLVED`
+    
+    * Jeśli nie znaleziono przerwać `switch`
+    
+  * Zmienić status zgłoszenia na `HINT`
+    
+  * Wysłać do wszystkich trenerów zmienioną listę zgłoszeń
+
+* Obsługa rozłączenia użytkownika
+
+  * Po rozłączeniu (event `close`) usunąc rozłączonego użytkownika
+  
+    * Przefiltrować kolekcję `state.participants` porównując `socket`
+    
+      * Wynikiem filtrowania nadpisać kolekcję
+      
+    * Przefiltrować kolekcję `state.trainers` porównując `socket`
+    
+      * Wynikiem filtrowania nadpisać kolekcję
+
+
+[Rozwiązanie](https://github.com/G3F4/warsawjs-workshop-34-trainer-needed/compare/etap-7...etap-8?expand=1)
 
 
 ## Wyzwania
@@ -507,13 +628,3 @@ Serwer:
     
   * Dodać obsługę ponownego połączenia użytkownika
    
-
- 
-
- 
-
- 
-
- 
-
- 

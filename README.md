@@ -400,7 +400,11 @@ Dodać obsługę przyjęcia zgłoszenia przez trenera.
 * Dodać obsługę akcji `ISSUE_TAKEN`
 
   * Znaleźć w kolekcji zgłoszenie wykorzystując `payload` zawierający identyfikator zgłoszenia i zapisać do stałej `issue`
-  
+    
+    * `userId` zgłoszenia równe `payload`
+        
+    * `status` różne od `SOLVED`
+   
     * Jeśli się nie udało przerwać `switch`
   
       * `if (!issue) break;`
@@ -460,6 +464,98 @@ Obsłużyć rozwiązanie problemu.
 
 ### Klient: 
 
+* Na ekranie trenera, podczas iteracji po zgłoszeniach dodać referencję do formularza ze wskazówką
+
+  * `const issueListHintFormNode = issueListItemNode.querySelector('.issueListHintForm');`
+  
+  * Dodać na formularzu nasłuchiwanie na event `submit`
+  
+    * Zablokować domyśle zachowanie eventu
+    
+      * `event.preventDefault();`
+      
+    * Zebrać dane z formularza
+      
+      * `const formData = new FormData(event.target);`
+      
+    * Wysłać event z akcją `HINT_SENT` i `payload` w postaci:
+    
+      * `hint` - wartość z pola formularza `hint`
+      
+      * `userId` - identyfikator użytkowanika (`it.userId`)
+      
+  * Zadbać o ukrywanie formularza gdy status równy `TAKEN`
+  
+    * Dodać nowy `case` dla statusu o wartości `TAKEN`
+    
+    * Ukryć element formularza dodając do niego klasę `hide`
+    
+  * Ukryć formularz domyślnie oraz kiedy status zgłoszenia równy `PENDING`
+  
+### Server:
+
+* Dodać obsługę akcji `HINT_SENT`
+
+  * Znaleźć uczestnika wykorzystująć `payload.userId`
+  
+    * Jeśli nie znaleziono przerwać `switch`
+    
+  * Znaleźć aktywne zgłoszenie uczestnika
+  
+    * `userId` zgłoszenia równe `participant.id`
+    
+    * `status` różne od `SOLVED`
+    
+    * Jeśli nie znaleziono przerwać `switch`
+    
+  * Wysłać do uczestnika event z akcją `HINT_REVIED` i `payload` równym `payload.id`
+  
+  * Zmienić status zgłoszenia na `HINT`
+  
+  * Wysłać do wszystkich trenerów zmienioną listę zgłoszeń
+  
+### Klient:
+
+* Dodać obsługę akcji `HINT_RECEIVED`
+
+  * Wyświetlić ekran podpowiedzi (`renderHintReceivedView`)
+  
+    * Przekazać `payload` do ekranu
+    
+  * Na ekranie podpowiedzi
+  
+    * Wyświetlić treść podpowiedzi dostępnej w argumencie funkcji ekranu `hint`
+    
+      * Znaleźć element o `id="hint"` i ustawić `textContent` na zawartość podpowiedzi
+  
+    * Dodać nasłuchiwanie na kliknięcie na element o `id="hintSuccess"`
+    
+      * Wysłać event z akcją `ISSUE_SOLVED`
+      
+      * Wyświetlić ekran zgłaszania (`renderIssueReceivedView`)
+  
+    * Dodać nasłuchiwanie na kliknięcie na element o `id="hintFail"`
+    
+      * Wysłać event z akcją `HINT_FAIL`
+      
+      * Wyświetlić ekran oczekiwania na trenera (`renderIssueReceivedView`)
+      
+### Serwer:
+
+* Dodać obsługę akcji `HINT_FAIL`
+
+  * Znaleźć aktywne zgłoszenie uczestnika
+  
+    * `userId` zgłoszenia równe `connectedUser.id`
+    
+    * `status` różne od `SOLVED`
+    
+    * Jeśli nie znaleziono przerwać `switch`
+    
+  * Zmienić status zgłoszenia na `HINT`
+    
+  * Wysłać do wszystkich trenerów zmienioną listę zgłoszeń
+
 * Dodać obsługę akcji `HINT_RECEIVED`  
 
   * Ustawić wartość `payload` wartości pola `hint` w stanie globalnym  
@@ -495,6 +591,8 @@ Serwer:
 * Dodać obsługę akcji `HINT` 
 
 * Dodać obsługę akcji `HINT_FAIL` 
+
+## Obsługa rozłączenia użytkownika
 
 
 ## Wyzwania

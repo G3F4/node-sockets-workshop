@@ -146,10 +146,10 @@ webSocketsServer.on('connection', (socket: WebSocket) => {
         issue.status = 'SOLVED';
 
         state.trainers.forEach(({ socket }) => {
-          socket.send(JSON.stringify({
+          sendEvent(socket, {
             action: 'ISSUES',
             payload: state.issues,
-          }));
+          });
         });
 
         break;
@@ -163,18 +163,18 @@ webSocketsServer.on('connection', (socket: WebSocket) => {
 
         if (!issue) break;
 
-        participant.socket.send(JSON.stringify({
+        sendEvent(participant.socket, {
           action: 'HINT_RECEIVED',
           payload: payload.hint,
-        }));
+        });
 
         issue.status = 'HINT';
 
         state.trainers.forEach(({ socket }) => {
-          socket.send(JSON.stringify({
+          sendEvent(socket, {
             action: 'ISSUES',
             payload: state.issues,
-          }));
+          })
         });
 
         break;

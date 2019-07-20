@@ -79,6 +79,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const renderHintReceivedView = hint => {
     renderTemplateById('hintReceived');
 
+    getNodeById('hint').textContent = hint;
+
     getNodeById('hintSuccess').addEventListener('click', () => {
       sendEvent({ action: 'ISSUE_SOLVED' });
       renderIssueSubmitView();
@@ -87,8 +89,6 @@ document.addEventListener('DOMContentLoaded', () => {
       sendEvent({ action: 'HINT_FAIL' });
       renderIssueReceivedView();
     });
-
-    getNodeById('hint').textContent = hint;
   };
   const renderTrainerDashboardView = data => {
     renderTemplateById('trainerDashboard');

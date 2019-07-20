@@ -263,16 +263,7 @@ const connectedUser: User = {
         * Dodać połączonego użytkownika do kanału uczestników `state.trainers`
         
         * Wysłać akcję `TRAINER_LOGGED` z pustym `payload` 
-        
-* Po rozłączeniu (event `close`) usunąc rozłączonego użytkownika
 
-  * Przefiltrować kolekcję `state.participants` porównując `socket`
-  
-    * Wynikiem filtrowania nadpisać kolekcję
-    
-  * Przefiltrować kolekcję `state.trainers` porównując `socket`
-  
-    * Wynikiem filtrowania nadpisać kolekcję
 
 ## 4. Wysyłanie sygnału pomocy 
 
@@ -566,44 +557,17 @@ Obsłużyć rozwiązanie problemu.
     
   * Wysłać do wszystkich trenerów zmienioną listę zgłoszeń
 
-* Dodać obsługę akcji `HINT_RECEIVED`  
+* Obsługa rozłączenia użytkownika
 
-  * Ustawić wartość `payload` wartości pola `hint` w stanie globalnym  
-
-* Na ekranie zgłoszenia jeśli `hint` nie jest puste wyświetlić: 
-
-  * Wiadomość od trenera  
+  * Po rozłączeniu (event `close`) usunąc rozłączonego użytkownika
   
-  * Przyciski: 
-  
-    * `Pomogło` 
-      
-      * Po kliknięciu wysyłać akcje `ISSUE_SOLVED` 
-      
-      * Wyświetlić ekran zgłaszania problemu 
-      
-      * Ustawić wartość pola `hint` na `null` 
-      
-    * `Nie pomogło` 
+    * Przefiltrować kolekcję `state.participants` porównując `socket`
     
-      * Po kliknięciu wysłać akcję `HINT_FAIL` z `payload` z wartością `issueId` 
+      * Wynikiem filtrowania nadpisać kolekcję
       
-      * Ustawić wartość pola `hint` na `null` 
-
-* Rozszerzyć strukturę reprezentującą zgłoszeniu na liście o pole `hint` 
-
-* Na ekranie listy zgłoszeń dodać szósta kolumnę z `textarea` na opis rozwiązania problemu oraz przycisk `wyślij` 
-
-  * Po kliknięciu wysłać event z akcją `HINT` z `payload` z wartością `textarea` 
-
-Serwer: 
-
-* Dodać obsługę akcji `HINT` 
-
-* Dodać obsługę akcji `HINT_FAIL` 
-
-## Obsługa rozłączenia użytkownika
-
+    * Przefiltrować kolekcję `state.trainers` porównując `socket`
+    
+      * Wynikiem filtrowania nadpisać kolekcję
 
 ## Wyzwania
 

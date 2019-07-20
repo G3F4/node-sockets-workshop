@@ -1,5 +1,22 @@
 # warsawjs-workshop-34-trainer-needed
 
+To jest repozytorium szkoleniowe w tematyce aplikacji czasu rzeczywistego. W ramach szkolenie zostanie zaimplementowana aplikacja do wzywania pomocy podczas eventów szkoleniowych. Do implementacji została wykorzystana paczka `ws`, będąca niskopoziomową, lekką implementacją techonologii WebSockets w środowisku `node`.
+Serwer aplikacji został napisany w `typescript`, natomiast front w czystym `JS`, z wykorzystaniem `HTML5` i `css3`.
+Repozytorium składa się z branchy podzielonych na kolejne etapy, następujące po sobie, zachowujące spójność, pomiędzy którymi można swobodnie się przełączać i kontynuować szkolenie od wybranego momentu. Ponadto każdy etap posiada przykłąd rozwiązania etapu w postaci diffa pomiędzy branchami kolejnych etapów.
+Do szkolenia potrzebne są:
+
+* Node w wersji nie starszej niż `11.x.x`
+
+* Przeglądarka internetowa
+
+  * Najnowszy `Chrome` lub `Firefox`
+  
+  * Edytor kodu wspierający `typescript`
+  
+    * `vscode`
+
+    * `WebStorm`
+
 ## HTTP vs. WebSockets
 
 ### Jak wygląda komunikacja HTTP

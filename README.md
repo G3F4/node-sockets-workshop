@@ -404,23 +404,12 @@ Dodać obsługę przyjęcia zgłoszenia przez trenera.
     * Jeśli się nie udało przerwać `switch`
   
       * `if (!issue) break;`
-
-  * Znaleźć w uczestnika wykorzystując obiekt zgłoszenia zawierający identyfikator uczestnika `issue.userId` i zapisać do stałej `partcipant`
-  
-    * Jeśli się nie udało przerwać `switch`
-  
-      * `if (!participant) break;`
       
-  * Wysłać do uczestnika akcję `ISSUE_TAKEN`
-    
-    * Jako `payload` ustawić nazwę trenera dostępną w `connectedUser.data.name`
-
   * Zmienić status zgłoszenia na `TAKEN`
   
     * Zauktualizować wartość przez referencję
 
   * Wysłać akcje `ISSUES` do wszystkich trenerów z nową listą zgłoszeń
-
 
 ## 7. Problem rozwiązany  
 
@@ -437,6 +426,18 @@ Dodać obsługę przyjęcia zgłoszenia przez trenera.
   * Zmienić na ekran zgłaszania problemu  
 
 ### Serwer: 
+
+* W akcji `ISSUE_TAKEN`
+
+  * Znaleźć w uczestnika wykorzystując obiekt zgłoszenia zawierający identyfikator uczestnika `issue.userId` i zapisać do stałej `partcipant`
+  
+    * Jeśli się nie udało przerwać `switch`
+  
+      * `if (!participant) break;`
+      
+  * Wysłać do uczestnika akcję `ISSUE_TAKEN`
+    
+    * Jako `payload` ustawić nazwę trenera dostępną w `connectedUser.data.name`
 
 * Po przyjęciu zgłoszenia odesłać akcje `ISSUE_RECEIVED` z `payload` z wartością identyfikatora utworzonego zgłoszenia 
 

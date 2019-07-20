@@ -118,10 +118,6 @@ webSocketsServer.on('connection', (socket: WebSocket) => {
 
         if (!issue) break;
 
-        const participant = state.participants.find(it => it.id === issue.userId);
-
-        if (!participant) break;
-
         issue.status = 'TAKEN';
 
         state.trainers.forEach(({ socket }) => {

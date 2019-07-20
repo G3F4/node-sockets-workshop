@@ -1,17 +1,44 @@
 # warsawjs-workshop-34-trainer-needed
 
-## 0. Przygotowanie do warszatatów:
+To jest repozytorium szkoleniowe w tematyce aplikacji czasu rzeczywistego. W ramach szkolenia zostanie zaimplementowana aplikacja do wzywania pomocy podczas eventów szkoleniowych. Do implementacji została wykorzystana paczka `ws`, będąca niskopoziomową, lekką implementacją techonologii WebSockets w środowisku `node`.
+Serwer aplikacji został napisany w `typescript`, natomiast front w czystym `JS`, z wykorzystaniem `HTML5` i `css3`.
+Repozytorium składa się z branchy podzielonych na kolejne etapy, następujące po sobie, zachowujące spójność, pomiędzy którymi można swobodnie się przełączać i kontynuować szkolenie od wybranego momentu. Ponadto każdy etap posiada przykład rozwiązania etapu w postaci diffa pomiędzy branchami kolejnych etapów.
+Do szkolenia potrzebne są:
 
-  * Sklonuj repozytorium
+* Node w wersji nie starszej niż `11.x.x`
+
+* Przeglądarka internetowa
+
+  * Najnowszy `Chrome` lub `Firefox`
   
-  * Zainstalouj zależności 
+  * Edytor kodu wspierający `typescript`
+  
+    * `vscode`
+
+    * `WebStorm`
+
+## HTTP vs. WebSockets
+
+### Jak wygląda komunikacja HTTP
+![alt text](https://res.cloudinary.com/di2vaxvhl/image/upload/v1545849277/HTTP_txch7g.png)
+©: https://res.cloudinary.com/
+
+### Jak wygląda komunikacja WebSockets
+![alt text](https://www.pubnub.com/wp-content/uploads/2014/09/WebSockets-Diagram.png)
+©: https://www.pubnub.com/
+
+## 0. Przygotowanie do warszatatów
+
+  * Sklonować repozytorium
+  
+  * Zainstalować zależności zależności 
   
     * `yarn` albo `npm i`
     
-  * Zmień branch na `etap-0`
+  * Zmienić branch na `etap-0`
 
 
-## 1. Serwer http z plikami statycznymi
+## 1. Serwer HTTP z plikami statycznymi
 
 Dodać prosty serwer HTTP serwujący pliki statyczne z folderu `public`.
 

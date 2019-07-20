@@ -114,7 +114,7 @@ webSocketsServer.on('connection', (socket: WebSocket) => {
         break;
       }
       case 'ISSUE_TAKEN': {
-        const issue = state.issues.find(it => it.id === payload);
+        const issue = state.issues.find(it => it.id === payload && it.status !== 'SOLVED');
 
         if (!issue) break;
 

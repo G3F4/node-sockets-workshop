@@ -154,6 +154,47 @@ webSocketsServer.on('connection', (socket: WebSocket) => {
 
         break;
       }
+      case 'HINT_SENT': {
+        const participant = state.participants.find(it => it.id === payload.userId);
+
+        if (!participant) break;
+
+        const issue = state.issues.find(it => it.userId === participant.id && it.status !== 'SOLVED');
+
+        if (!issue) break;
+
+        sendEvent(participant.socket, {
+          action: 'HINT',
+          payload: payload.hint,
+        });
+
+        issue.status = 'HINT';
+
+        state.trainers.forEach(({ socket }) => {
+          sendEvent(socket, {
+            action: 'ISSUES',
+            payload: state.issues,
+          });
+        });
+
+        break;
+      }
+      case 'HINT_FAIL': {
+        const issue = state.issues.find(it => it.userId === connectedUser.id && it.status !== 'SOLVED');
+
+        if (!issue) break;
+
+        issue.status = 'PENDING';
+
+        state.trainers.forEach(({ socket }) => {
+          sendEvent(socket, {
+            action: 'ISSUES',
+            payload: state.issues,
+          });
+        });
+
+        break;
+      }
       default: {
         console.error('unknown action');
       }

@@ -546,7 +546,7 @@ Obsłużyć rozwiązanie problemu.
     
     * Jeśli nie znaleziono przerwać `switch`
     
-  * Wysłać do uczestnika event z akcją `HINT_REVIED` i `payload` równym `payload.id`
+  * Wysłać do uczestnika event z akcją `HINT` i `payload` równym `payload.id`
   
   * Zmienić status zgłoszenia na `HINT`
   
@@ -554,7 +554,7 @@ Obsłużyć rozwiązanie problemu.
   
 ### Klient:
 
-* Dodać obsługę akcji `HINT_RECEIVED`
+* Dodać obsługę akcji `HINT`
 
   * Wyświetlić ekran podpowiedzi (`renderHintReceivedView`)
   

@@ -193,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderTrainerDashboardView(payload);
         break;
       }
-      case 'HINT_RECEIVED': {
+      case 'HINT': {
         renderHintReceivedView(payload);
         break;
       }

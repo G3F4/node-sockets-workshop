@@ -496,7 +496,25 @@ Serwer:
 
 * Dodać obsługę akcji `HINT_FAIL` 
 
+
+## Wyzwania
+
+ * Dodać walidację czy użytkownik o danej nazwie już istnieje
  
+ * Wyświetlić listę uczestnik na ekranie zgłoszeń trenera
+ 
+ * Dodać więcej danych do tabeli zgłoszeń:
+ 
+  * Data zgłoszenia i data ostatniej modyfikacji
+  
+  * Nazwa trenera, który przyjął zgłoszenie
+  
+  * Dodać ekran `Moje zgłoszenia`, który by wyświetlał się po zalogowaniu uczestnika i po rozwiązaniu problemu
+  
+    * Na ekranie przycisk `Nowe zgłoszenie` do przejścia na ekran zgłaszania pomocy
+    
+  * Dodać obsługę ponownego połączenia użytkownika
+   
 
  
 

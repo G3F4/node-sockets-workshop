@@ -392,7 +392,7 @@ Dodać obsługę przyjęcia zgłoszenia przez trenera.
         
     * dla `default`:
     
-      * do elementu `takeIssueButtonNode` dodać klasę `hide' wykorzystując `.classList.add('hide')`
+      * do elementu `takeIssueButtonNode` dodać klasę `hide` wykorzystując `.classList.add('hide')`
       
 
 ### Serwer: 

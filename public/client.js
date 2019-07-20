@@ -144,10 +144,6 @@ document.addEventListener('DOMContentLoaded', () => {
         renderIssueReceivedView();
         break;
       }
-      case 'ISSUE_TAKEN': {
-        renderIssueTakenView(payload);
-        break;
-      }
       case 'ISSUES': {
         renderTrainerDashboardView(payload);
         break;

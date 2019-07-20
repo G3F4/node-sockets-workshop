@@ -370,7 +370,7 @@ switch (action) {
     
       * `issueListNode.appendChild(issueListItemNode);`
 
-## 6. Odpowiedź na zgłoszenie  
+## 6. Przyjęcie zgłoszenia
 
 Dodać obsługę przyjęcia zgłoszenia przez trenera.
 
@@ -394,13 +394,6 @@ Dodać obsługę przyjęcia zgłoszenia przez trenera.
     
       * do elementu `takeIssueButtonNode` dodać klasę `hide' wykorzystując `.classList.add('hide')`
       
-  * Dodać obsługę akcji `ISSUE_TAKEN`
-  
-    * Wyświetlić ekran informujący o przyjęciu zgłoszenia
-    
-      * Wywołać funkcję `renderIssueTakenView` i przekazać `payload`
-      
-        * Znaleźć element o `id="issueTakenHeader"` i ustawić wartość pola `textContent` na `Trener ${trainerName} przyjął Twoje zgłoszenie, zaraz podejdzie.`
 
 ### Serwer: 
 
@@ -428,11 +421,6 @@ Dodać obsługę przyjęcia zgłoszenia przez trenera.
 
   * Wysłać akcje `ISSUES` do wszystkich trenerów z nową listą zgłoszeń
 
-* Dodać obsługę akcji `ISSUE_SOLVED` analogicznie do akcji `ISSUE_TAKEN`
-
-  * Do znalezienia zgłoszenia wykorzystać `connectedUser.id`
-  
-  * Zmienić stan zgłoszenia na `SOLVED`
 
 ## 7. Problem rozwiązany  
 

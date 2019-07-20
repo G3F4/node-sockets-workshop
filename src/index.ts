@@ -122,11 +122,6 @@ webSocketsServer.on('connection', (socket: WebSocket) => {
 
         if (!participant) break;
 
-        sendEvent(participant.socket, {
-          action: 'ISSUE_TAKEN',
-          payload: connectedUser.data && connectedUser.data.name,
-        });
-
         issue.status = 'TAKEN';
 
         state.trainers.forEach(({ socket }) => {
@@ -134,22 +129,6 @@ webSocketsServer.on('connection', (socket: WebSocket) => {
             action: 'ISSUES',
             payload: state.issues,
           });
-        });
-
-        break;
-      }
-      case 'ISSUE_SOLVED': {
-        const issue = state.issues.find(it => it.userId === connectedUser.id);
-
-        if (!issue) break;
-
-        issue.status = 'SOLVED';
-
-        state.trainers.forEach(({ socket }) => {
-          socket.send(JSON.stringify({
-            action: 'ISSUES',
-            payload: state.issues,
-          }));
         });
 
         break;

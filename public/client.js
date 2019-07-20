@@ -68,13 +68,6 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   const renderIssueTakenView = trainerName => {
     renderTemplateById('issueTaken');
-
-    getNodeById('issueTakenHeader').textContent = `Trener ${trainerName} przyjął Twoje zgłoszenie, zaraz podejdzie.`;
-
-    getNodeById('issueSolved').addEventListener('click', () => {
-      sendEvent({ action: 'ISSUE_SOLVED' });
-      renderIssueSubmitView();
-    });
   };
   const renderHintReceivedView = hint => {
     renderTemplateById('hintReceived');

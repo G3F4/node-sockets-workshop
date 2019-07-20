@@ -449,7 +449,11 @@ Obsłużyć rozwiązanie problemu.
 
   * Dodać obsługę akcji `ISSUE_SOLVED`
   
-  * Wykorzystać identyfikator  z `payload` do odnalezienia zgłoszenia i aktualizacji statusu zgłoszenia na `SOLVED` 
+    * Akcja działa analogicznie do akcji `ISSUE_TAKEN` z tymi różnicami:
+    
+      * Nie wysyłamy żadnego eventu do uczestnika, którego dotyczyło zgłoszenie
+      
+      * Status zgłoszenia zmienić na `SOLVED`
 
 
 ## 8. Pomoc przez wiadomość  

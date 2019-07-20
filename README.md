@@ -1,17 +1,17 @@
 # warsawjs-workshop-34-trainer-needed
 
-## 0. Przygotowanie do warszatatów:
+## 0. Przygotowanie do warszatatów
 
-  * Sklonuj repozytorium
+  * Sklonować repozytorium
   
-  * Zainstalouj zależności 
+  * Zainstalować zależności zależności 
   
     * `yarn` albo `npm i`
     
-  * Zmień branch na `etap-0`
+  * Zmienić branch na `etap-0`
 
 
-## 1. Serwer http z plikami statycznymi
+## 1. Serwer HTTP z plikami statycznymi
 
 Dodać prosty serwer HTTP serwujący pliki statyczne z folderu `public`.
 

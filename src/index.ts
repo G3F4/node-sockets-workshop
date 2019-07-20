@@ -138,6 +138,22 @@ webSocketsServer.on('connection', (socket: WebSocket) => {
 
         break;
       }
+      case 'ISSUE_SOLVED': {
+        const issue = state.issues.find(it => it.userId === connectedUser.id);
+
+        if (!issue) break;
+
+        issue.status = 'SOLVED';
+
+        state.trainers.forEach(({ socket }) => {
+          socket.send(JSON.stringify({
+            action: 'ISSUES',
+            payload: state.issues,
+          }));
+        });
+
+        break;
+      }
       default: {
         console.error('unknown action');
       }

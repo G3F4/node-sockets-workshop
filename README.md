@@ -404,7 +404,7 @@ Dodać obsługę przyjęcia zgłoszenia przez trenera.
 
 ### Serwer: 
 
-* Dodać obsługę akcji `ISSUE_TAKEN` 
+* Dodać obsługę akcji `ISSUE_TAKEN`
 
   * Znaleźć w kolekcji zgłoszenie wykorzystując `payload` zawierający identyfikator zgłoszenia i zapisać do stałej `issue`
   
@@ -422,18 +422,21 @@ Dodać obsługę przyjęcia zgłoszenia przez trenera.
     
     * Jako `payload` ustawić nazwę trenera dostępną w `connectedUser.data.name`
 
-  * Zmienić status zgłoszenia na `TAKEN` 
+  * Zmienić status zgłoszenia na `TAKEN`
   
     * Zauktualizować wartość przez referencję
 
   * Wysłać akcje `ISSUES` do wszystkich trenerów z nową listą zgłoszeń
 
+* Dodać obsługę akcji `ISSUE_SOLVED` analogicznie do akcji `ISSUE_TAKEN`
+
+  * Do znalezienia zgłoszenia wykorzystać `connectedUser.id`
+  
+  * Zmienić stan zgłoszenia na `SOLVED`
 
 ## 7. Problem rozwiązany  
 
 ### Klient: 
-
-* Dodać do stanu globalnego pole `issueId` inicjalnie równe `null` 
 
 * Dodać obsługę akcji `ISSUE_RECEIVED` 
 

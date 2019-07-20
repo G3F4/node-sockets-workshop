@@ -1,457 +1,592 @@
 # warsawjs-workshop-34-trainer-needed
 
-## 1. Serwer http `Hello world` 
+## 1. Serwer http z plikami statycznymi
 
-* Utworzyć folder `src` w głównym folderze projektu 
+Do rozpoczęcia pracy potrzebny jest serwer obsługujący protokuł http. 
+Dodać prosty serwer serwujący pliku statyczne z folderu `public`.
 
-* Dodać plik `index.ts` w folderze `/src` 
+* Hello world serwera http (`/src/index.ts`)
 
   * Utworzyć serwer przy wykorzystaniu funkcji `createServer` ze wbudowanego modułu `http` 
 
-    * Jako pierwszy argument przekazać pusty obiekt z opcjami serwera 
+    * Zapisać do stałej `server`
+      
+    * Przekazać handler serwera w postaci funkcji `(request, response) => {...}`
 
-    * Jako drugi, handler serwera w postaci funkcji 
-
+      * Dodać blok `try catch`, który obejmie cały kod handlera
+        
+        * w przypadku błędu wyświetlić błąd do konsoli
+        
+        * wysłać odpowiedź w postać `e.toString()` gdzie `e` to wyłapany błąd przez `catch`
+      
       * Handler serwera w odpowiedzi na wszystkie zapytania zwraca tekst `Test server` 
+      
+        * Wykorzystać metodę `end` obiektu `response`
 
-  * Ustawić nasłuchiwanie na port `3000` 
-
-## 2. Pliki statyczne  
-
-* Utworzyć folder `public` w głównym folderze projektu  
-
-   * Wewnątrz folderu utworzyć pliki statyczne projektu: 
-
-    * `style.css` 
-
-      * Dodać styl dla body resetujący domyślny `padding` i `margin` 
-
-    * `client.js` 
-
-      * Dodać wywołanie `console.log('client test')` 
-
-    * `index.html`  
-
-      * Dodać minimalny poprawny dokument `html`.  
-
-        * Dodać powiązanie do wcześniej utworzonych plików `style.css`, `client.js`  
-
-        * Dodać pusty element `div` z atrybutem `id="root"` 
+  * Dodać nasłuchiwanie wykorzystując metodę `listen` obiektu `server`
+    
+    * Przekazać jako pierwszy argument stałą `PORT`
+    
+    * Jako drugi funkcję, która wywoła się po uruchomieniu serwera
+    
+      * Użyć `console.log` aby sprawdzić czy serwer rozpoczął nasłuchiwanie na porcie
 
 * Modyfikacja handlera serwera, tak aby zwracał pliki statyczne 
 
-  * Odczytanie do stałej (`const`) o nazwie `url` adresu `URL` z obiektu zapytania (zazwyczaj nazywany `req`, pierwszy argument wywołania handlera) wykorzystując atrybut obiektu zapytania `req.url` 
+  * Zapisać do stałej `url` adres URL z obiektu zapytania wykorzystując `request.url` 
+  
+    * W przypadku gdy adres jest równy `/` ustawić wartość `index.html`
+    
+      * Wykorzystać operator `? :`
+      
+  * Utworznie stałej `urlParts` z wartością `url.split('.')`
 
-  * Rozbicie adresu `URL` na ścieżkę do pliku oraz jego rozszerzenie (potrzebne do ustawienia headera `Content-Type`) i zapisanie do stałej `urlParts` wykorzystując metodę `split` stringa z argumentem `.` (zakładamy optymistycznie że w adresie `URL` nie ma znaku kropki) 
+  * Utworznie stałej `fileExtension` z wartością ostatniego elementu tablicy `urlParts`
+  
+  * Utworznie stałej `contentType` z wartością z mapy `FILE_EXTENSION_TO_CONTENT_TYPE`, której kluczami są rozszerzenia plików
 
-  * Utworznie stałej przechowujacej rozszerznie pliku o nazwie `fileExtension` 
+  * Ustawić status odpowiedzi wykorzystując metodę `writeHead` obiektu odpowiedzi (drugi argument handlera, zazwyczaj nazywany `res`) 
 
-  * Utworznie zmiennej na wartość headera `Content-Type` o nazwie `contentType` 
+    * Jako pierwszy argument przekazać status odpowiedzi równy `200` 
 
-  * Utworznie `switch` operujący na `fileExtension` 
-
-    * Dla plików `html` ustawia wartość `contentType` na `html/css` 
-
-    * Dla plików `css` ustawia wartość `contentType` na `text/css` 
-
-    * Dla plików `js` ustawia wartość `contentType` na `text/javascript` 
+    * Jako drugi argument przekazać obiekt `{ 'Content-Type': contentType }`
 
   * Wczytanie pliku 
 
     * Wykorzystać funckje `readFileSync` ze wbudowanego modułu `fs`  
+      
+      * Zapisać do stałej `file`
 
       * Jako pierwszy argument przekazać absolutną ścieżkę do pliku 
 
         * Do pobrania ścieżki projektu możesz skorzystać z `proces.cwd()` 
 
-      * Drugi argument to typ kodowania pliku  
+  * Wykorzystując metodę `response.end` zakończyć zapytanie przekazując do metody zawartość wczytanego pliku  
+  
+## 2. Dodanie WebSocketów 
 
-        * Ustawić `utf-8` 
-
-  * Ustawić status odpowiedzi wykorzystując metodę `writeHead` obiektu odpowiedzi (drugi argument handlera, zazwyczaj nazywany `res`) 
-
-    * Jako pierwszy argument przekazać status odpowiedzi na `200` 
-
-    * Jako drugi argument przekazać obiekt zawierający definicje nagłówków w notacji zgodnej ze standardem `HTTP` 
-
-  * Wykorzystując metodę `end` obiektu odpowiedzi (`res`) zakończyć zapytanie przekazując do metody zawartość czytanego pliku  
-
-  * Owrapować kod zawarty do tej pory w handlarze blokiem `try/catch` 
-
-    * W przypadku nie powodzenia wczytywania pliki zwracamy komunikat błędu w postaci statycznego tekstu  
-
-## 3. Dodanie WebSocketów 
+Ustanowić stałe połaączenie pomiędzy klientem a serwerem wykorzystując WebSockety
 
 ### Serwer: (`/src/index.ts`) 
 
-* Zainstalować pakiet `ws`, który posłuży do obsługi połączenia w technologii `WebSockets` 
+* Utworzyć nową instancję serwera `new WebSocket.Server` o nazwie `webSocketsServer` 
 
-* W pliku `index.ts` zaimportować klasę `Server` z pakietu `ws` 
+  * Przekazać do konstruktora obiekt konfiguracyjny z kluczem `server`, wskazujący na referencje do serwera HTTP 
 
-* Utworzyć nową instancję serwera `ws` o nazwie `webSocketsServer` 
-
-  * Przekazać do konstruktora obiekt konfiguracyjny z kluczem `server`, wskazujący na referencje do serwera `HTTP` 
-
-* Dodać do serwera `WebSockets` nasłuchiwanie na `event` połączenia o nazwie `connection` przy wykorzystaniu metody `on` 
+* Dodać do serwera WebSockets nasłuchiwanie na `event` połączenia o nazwie `connection` przy wykorzystaniu metody `on` 
 
   * Klasa `Server` z pakietu `ws` dziedziczy do klasie `EventEmmiter` 
 
   * Handler eventu `connection` jako argument wywołania dostaje socket, który reprezentuje połączenie z klientem 
 
-  * Handler w reakcji na event połączenia odsyła wiadomość powitalną `connected to socket server` wykorzystując metodę `send` 
+    * Wypisać do konsoli `socket connected`
+    
+    * Odesłać wiadomość powitalną o treści `welcome` wykorzystując `socket.send` 
 
-    * Jako argument przekazujemy `string` albo `Buffer` 
+* Dodać do `webSocketsServer` nasłuchiwanie na event `message` przy wykorzystaniu metody `on` 
 
-* Dodać do serwera `WebSockets` nasłuchiwanie na `event` połączenia o nazwie `message` przy wykorzystaniu metody `on` 
+  * Wypisać do konsoli dane eventu dostępne w argumencie handlera 
 
-  * W reakcji na zdarzenie wypisać do konsoli dane eventu dostępne w polu `data` 
+* Dodać do `webSocketsServer` nasłuchiwanie na event `close` przy wykorzystaniu metody `on` 
 
- 
+  * Wypisać do konsoli `socket closed`
+
 
 ### Klient: (`/public/client.js`) 
 
-* Dodać nasłuchiwanie na event `DOMContentLoaded` wykorzystując metodę `addEventListner`  
+* W handlerze eventu `DOMContentLoaded` stworzyć nowe polaczeniem do serwera `WebSockets` 
 
-  * Handler eventu tworzy nowe polaczeniem do serwera `WebSockets` 
+  * Utworzyć instancję socketa wykorzystując klasę `WebSockets` o nazwie `socket` 
 
-    * Utworzyć instancję socketa wykorzystując klasę `WebSockets` o nazwie `socket` 
+    * Konstruktor przyjmuje argument typu `string`, który reprezentuje adres serwera WebSockets `ws://localhost:5000`
 
-      * Konstruktor przyjmuje argument typu `string`, który reprezentuje adres serwera `WebSockets` 
+  * Zaimplementować obsługę eventów: 
 
-    * Zaimplementować obsługę eventów: 
+    * `onopen` - wywoływany po ustanowieniu połączenia z serwerem 
 
-      * `onopen` - wywoływany po ustanowieniu połączenia z serwerem 
+      * W reakcji na event: `console.log(['WebSocket.onopen'], event);`
 
-        * W reakcji na event klient odsyła wiadomość powitalną `hello server` wykorzystując metodę `send` obiektu `socket` (instancja klasy `WebSockets`) 
+    * `onmessage` - wywoływany przy każdej wiadomości serwera 
 
-      * `onmessage` - wywoływany przy każdej wiadomości serwera 
+      * W reakcji na event: `console.log(['WebSocket.onmessage'], event);`  
 
-        * W reakcji na zdarzenie wypisać do konsoli dane eventu dostępne  pod polem `data` obiektu eventu  
+    * `onerror` - wywoływany przy każdym błędzie komunikacji z serwerem 
 
-      * `onerror` - wywoływany przy każdym błędzie komunikacji z serwerem 
+      * W reakcji na event: `console.log(['WebSocket.onerror'], event);`  
 
-        * W reakcji na zdarzenie wypisać do konsoli błąd  
+    * `onclose` - wywoływany w sytuacji kiedy serwer zakończy połączenie z socketem 
 
-      * `onclose` - wywoływany w sytuacji kiedy serwer zakończy połączenie z socketem 
+      * W reakcji na event: `console.log(['WebSocket.onclose'], event);`  
 
-        * W reakcji na zdarzenie wypisać do konsoli informację o przerwaniu połączenia z serwerem  
-
-## 4. Autentykacja użytkownika 
+## 3. Autentykacja użytkownika 
 
 ### Klient: 
 
-* Dodać ekran powitalny  
+* Dodać funckję do wysyłanie eventów:
 
-  * Dodać funkcję renderującą ekran powitalny `renderLandingView` 
+```javascript
+const sendEvent = (action, payload) => {
+  try {
+    socket.send(JSON.stringify({ action, payload }));
+  }
+
+  catch (e) {
+    console.error(e);
+  }
+};
+```
+
+* Na ekranie powitalnym (funckja `renderLandingView`)
   
-    * Zapisać do stałej `rootNode` referencję do węzła o `id="root" wykorzystując `document.getElementById` 
-    
-    * Analogicznie zrobić z szablonem (`<template id="landing">`), nazwać referenję `landingTemplate` 
-    
-    * Stworzyć nowy element na podstawie szablonu wykorzystując `document.importNode` - nazwa `landingNode` 
-    
-      * Jako pierwszy argument przekazać `landingTemplate.content` 
-    
-      * Jako drugi `true` 
-    
-    * Wyczyścić zawartośc `rootNode` 
-    
-      * `rootNode.innerHTML = '';` 
-    
-    * Dodać do głównego węzła stworzony element: 
-    
-      * `rootNode.appendChild(landingNode);` 
-    
-    * Dodać nasłuchiwanie na kliknięcie w element z `id="loginParticipant"` wykorzystując `addEventListener` 
-    
-      * Stworzyć pustą funkcję `renderParticipantLoginView` 
-    
-      * Przekazać nową funkcję jako handler zdarzenia kliknięcia 
-    
-    * Analogicznie dla elementu z `id="loginParticipant"` 
+  * WAŻNE: `renderTemplateById` musi być zawsze wywołane w pierwszej kolejności, inaczej elementy ekranu nie będą wyrenderowane, nie będzie można z nimi nic zrobić
 
-* Ekran logowania uczestnika  
-
-  * Dodać funkcję renderującą ekran logowania uczestnika analogicznie do strony powitalnej - `renderParticipantLoginView` 
+  * Dodać nasłuchiwanie na kliknięcie w element z `id="loginParticipant"` wykorzystując `addEventListener` oraz `getNodeById`
   
-    * Dodać nasłuchiwanie na event `submit` na elemencie formularza z `id="participantLoginForm"` 
+    * Przekazać nową funkcję jako handler funckję `renderParticipantLoginView`
+  
+  * Analogicznie zrobić dla elementu z `id="trainerParticipant"` 
+
+* Ekran logowania uczestnika (funkcja `renderParticipantLoginView`)
+
+  * Dodać nasłuchiwanie na event `submit` na elemencie formularza z `id="participantLoginForm"` 
+  
+    * Zablokować domyślne działanie zdarzenia poprzez `event.preventDefault();`
     
-      * Postać eventu: 
+    * Wykorzystać `FormData` do zebrania danych z formulurza 
+    
+      * `const formData = new FormData(event.target);` 
       
-        * `action` o wartości `PARTICIPANT_LOGIN` 
+      * Dostęp do danych `formData.get(group)` gdzie `group` do wartość atrybutu `name` elementu input formularza 
+      
+      * Nazwy pól w formularzu: 
         
-        * `payload` o wartości danych z formularza  
+        * `name` 
         
-          * Wykorzystać `FormData` do zebrania danych z formulurza 
-          
-          * `const formData = new FormData(event.target);` 
-          
-          * Dostęp do danych `formData.get(group)` gdzie `group` do wartość atrybutu `name` elementu input formularza 
-          
-          * Nazwy pól w formularzu: 
-            
-            * `name` 
-            
-            * `group` 
+        * `group` 
+        
+    * Wykorzystać funkcję `sendEvent` do wysłania eventu do serwera WebSocket, przekazać obiekt z kluczami: 
+    
+      * `action` o wartości `PARTICIPANT_LOGIN` 
+      
+      * `payload` o wartości danych z formularza w postaci obiektu, gdzie nazwy pól to klucze
+      
 
 * Ekran logowania trenera 
 
-  * Dodać funkcję renderującą ekran logowania uczestnika analogicznie do strony powitalnej - `renderTrainerLoginView` 
-
-    * Dodać nasłuchiwanie na event `submit` formularza `id="trainerLoginForm"` 
+  * Wykonać analogicznie dla ekranu logowania uczestnika
 
 ### Serwer 
 
-Obsługa eventu logowania  
+* Dodać obiekt na poziomie pliku, który będzie reprezentował stan serwera
 
-  * Dodać obiekt na poziomie pliku, który będzie reprezentował stan serwera - `state` 
+  * Obiekt zawiera dwie kolekcje, symulujące kanały
+```javascript
+const state: State = {
+  participants: [],
+  trainers: [],
+};
+```
+
+* Obiekt reprezentujący podłączonego użytkownika 
+
+  * `type` - `PARTICIPANT` lub `TRAINER` 
   
-    * Dodać pole `users` z inicjalnie pustą tablicą 
+  * `data` - dane zebrane podczas logowania 
   
-  * Obiekt reprezentujący podłączonego użytkownika 
+  * `socket` - referencja do socketa użytkownika 
   
-    * `type` - `PARTICIPANT` lub `TRAINER` 
-    
-    * `data` - dane zebrane podczas logowania 
-    
-    * `socket` - referencja do socketa użytkownika 
-    
-  * Po połączeniu (event `connection`) zapisać do kolekcji nowy socket, zostawiając pola `userType` oraz `userData` puste 
+* Na poziomie pliku dodać funckję wysyłające event dbającą o obsługę błędu
+
+```javascript
+const sendEvent = (socket: WebSocket, event: Event): void => {
+  try {
+    socket.send(JSON.stringify(event));
+  }
+
+  catch (e) {
+    console.error(e);
+  }
+};
+```
   
-  * Dodać prosty system akcji przy wykorzystaniu instrukcji warunkowej `switch` w handlerze eventu `message` 
-    
-    * Sparsować zawartość pola `data` eventu wykorzystując `JSON.parse` 
-    
-      * Zapisać do stałych pola obiektu `action` oraz `payload` 
-    
+* Po połączeniu (event `connection`) stworzyć w domknięciu stałą reprezentującą połączonego użytkownika
+
+```javascript
+const connectedUser: User = {
+  id: `user-id-${Date.now()}`,
+  data: {
+    name: '',
+    group: '',
+  },
+  socket,
+};
+```
+
+* W evencie `message`:
+
+  * Sparsować argument eventu zrzutowany do `string` (`.toString()`) wykorzystując `JSON.parse` 
+  
+    * Zapisać do stałych pola obiektu `action` oraz `payload` 
+
+  * Dodać prosty system akcji przy wykorzystaniu instrukcji warunkowej `switch`
+  
     * Wykorzystać `action` w instrukcji `switch` 
+    
+      ```javascript
+      switch (action as Action) {
+        case 'PARTICIPANT_LOGIN': {
+        ...
+          break;
+        }
+        case 'TRAINER_LOGIN': {
+        ...
+          break;
+        }
+        default: {
+          console.error('unknown action');
+        }
+      }
+      ```
       
       * Dodać obsługę akcji `PARTICIPANT_LOGIN` 
       
-        * Znaleźć w kolekcji obiekt zawierający socket, który wywołał event `message` 
+        * Zaktualizować dane połączonego użytkownika `connectedUser.data` zawartością `payload` 
         
-        * Zaktualizować pola `userType` na `PARTICIPANT` 
-        
-        * Zaktualizować  wartość pola `userData` zawartością `payload` 
+        * Dodać połączonego użytkownika do kanału uczestników `state.participants`
         
         * Wysłać akcję `PARTICIPANT_LOGGED` z pustym `payload` 
         
       * Dodać obsługę akcji `TRAINER_LOGIN` 
         
-        * Znaleźć w kolekcji obiekt zawierający socket, który wywołał event `message` 
-        
-        * Zaktualizować pola `userType` na `TRAINER` 
-        
-        * Zaktualizować  wartość pola `userData` zawartością `payload` 
+        * Zaktualizować dane połączonego użytkownika `connectedUser.data` zawartością `payload` 
+                
+        * Dodać połączonego użytkownika do kanału uczestników `state.trainers`
         
         * Wysłać akcję `TRAINER_LOGGED` z pustym `payload` 
 
-## 5. Wysyłanie sygnału pomocy 
+
+## 4. Wysyłanie sygnału pomocy 
 
 ### Klient: 
 
-* Dodać ekran wysyłania sygnału pomocy  
+* W evencie `onmessage` dodać prosty system nasłuchiwania na akcje, analogiczny do tego z serwera
 
-  * Wyświetlić `input` na krótki opis problemu 
+```javascript
+switch (action) {
+      case 'PARTICIPANT_LOGGED': {
+        break;
+      }
+    }
+```
+
+* Dodać obługę akcji `PARTICIPANT_LOGGED`
+
+  * Wywołać funckję `renderIssueSubmitView`
   
-  * Wyświetlić przycisk z tekstem `Trainer needed` 
+* Dodać obsługę akcji `ISSUE_RECEIVED`
 
-* Po zalogowaniu wyświetlić ekran wysyłania sygnału pomocy  
-
-* Dodać obsługę kliknięcia w przycisk `Trainer needed` 
-
-  * Po kliknięciu wysłać event z `action` o wartości  `TRAINER_NEEDED` i `payload` z wartością inputa z opisem problemu  
+  * Wywołać funckję `renderIssueReceivedView`
+  
+* Na ekranie zgłaszania sygnału pomocy
+  
+  * Dodać obsługę eventu `submit` formularza o `id="issueSubmitForm"`
+  
+    * Po kliknięciu wysłać event z `action` o wartości  `TRAINER_NEEDED` i `payload` z wartością inputa `problem`
+     
 
 ### Serwer: 
 
-* Dodać kolekcje reprezentującą zgłoszenia uczestników w postaci: 
+* Dodać kolekcje reprezentującą zgłoszenia uczestników do stanu serwera pod kluczem `issues` w postaci: 
   
   * `id` - unikalny identyfikator  
   
-  * `status` - enum o wartości `RECEVIED` 
+  * `status` - statnus zgłoszenia
   
   * `userId` - identyfikator uczestnika 
   
+  * `userName` - nazwa uczestnika
+  
+  * `userGroup` - grupa uczestnika
+   
   * `problem` - opis problemu  
 
 * Dodać obsługę akcji `TRAINER_NEEDED` 
   
   * W odpowiedzi na event dodać nowy element do kolekcji zgłoszeń  
   
-  * Wysłać do użytkownika wiadomość o przyjęciu zgłoszenia  
+  * Wysłać do użytkownika event z akcją `ISSUE_RECEIVED` i pustym `payload`
 
-## 6. Wyświetlanie zgłoszeń  
+## 5. Wyświetlanie zgłoszeń  
 
 ### Serwer 
 
 * Wysyłanie listy zgłoszeń  
 
-  * Po zalogowaniu trenera wysłać event z akcją `ISSUE_LIST` i `payload` z kolekcją zgłoszeń w postaci: 
-    
-    * `issueId` - identyfikator zgłoszenia 
-    
-    * `user` 
-    
-    * `name`  - nazwa uczestnika  
-    
-    * `group` - numer grupy 
-    
-    * `problem` - opis problemu  
-    
-    * `status` - status zgłoszenia 
+  * Do akcji `TRAINER_LOGGED` dodać `payload` z kolekcją zgłoszeń
   
-  * Po wystąpieniu akcji `TRAINER_NEEDED` wysłać kolekcje ze zgłoszeniami do wszystkich trenerów w analogicznej do logowania trenera 
+  * Po wystąpieniu akcji `TRAINER_NEEDED` wysłać do wszystkich trenerów akcji `ISSUES` z `payload` jako wszystkie zgłoszenia
+
+### Klient: 
+    
+* Dodać obsługę akcji `ISSUES`
+
+  * wywołać funkcję `renderTrainerDashboardView` i przekazać jej `payload`
+
+* Dodać obsługę akcji `TRAINER_LOGGED`
+
+  * wywołać funkcję `renderTrainerDashboardView` i przekazać jej `payload`
+  
+* Dodać referencję do elementów o `issueListItem` i `issueList`
+
+  ```javascript
+  const issueListItemTemplate = getNodeById('issueListItem');
+  const issueListNode = getNodeById('issueList');
+  ```
+* Przeiterować się z użyciem `forEach` po argumecie `data`, który jest tablicą zgłoszeń w postaci wysłanej przez serwer
+
+  ```javascript
+  data.forEach(it => {
+    ...
+  });
+  ```
+  * Podczas każdej iteracji tworzyć nowy element na podstawie szablonu `issueListItemTemplate`
+   
+    `const issueListItemNode = document.importNode(issueListItemTemplate.content, true);`
+    
+  * W stworzonym elemencie ustawić zawartość tekstu, nadpisująć zawartość pola `textContent` elementu
+  
+    * `issueListItemNode.querySelector('.issueListItemName').textContent = it.userName;`
+      
+      * Element posiada klasy, dzięki którym można zidentyfikować element do wyświetlenia danach:
+      
+        * `.issueListItemName` - kolumna z nazwą uczestnika
+        
+        * `.issueListItemGroup` - kolumna z grupą uczestnika
+        
+        * `.issueListItemProblem` - kolumna z problemem uczestnika
+        
+        * `.issueListItemStatus` - kolumna ze statusem zgłoszenia
+        
+    * Dodać do parenta
+    
+      * `issueListNode.appendChild(issueListItemNode);`
+
+## 6. Przyjęcie zgłoszenia
+
+Dodać obsługę przyjęcia zgłoszenia przez trenera.
 
 ### Klient: 
 
-* Dodać ekran z listą zgłoszeń 
+* Na ekranie listy zgłoszeń, podczas iteracji po zgłoszenia
 
-  * Ekran do wyświetlania potrzebuje listy zgłoszeń 
+  * Dodać referenję do przycisku `Przyjmij zgłoszenie`
   
-  * Wyświetlić listę w postaci kolumn z wierszami używając `flex-box` 
+    * `const takeIssueButtonNode = issueListItemNode.querySelector('.issueListItemActions button');`
+  
+  * Dodać `switch` pracujący na statusie zgłoszenia `it.status` po `issueListNode.appendChild(issueListItemNode);`
     
-    * W pierwszej kolumnie nazwę uczestnika  
+    * Dla statusu `PENDING`:
     
-    * W drugiej kolumnie grupę uczestnika 
+      * Dodać nasłuchiwanie na kliknięcie na elemencie `takeIssueButtonNode`
+      
+        * W odpowiedzi na kliknięcie wysłać event z akcją `ISSUE_TAKEN` z identyfikatorem zgłoszenia `it.id` jako `payload`
+        
+    * dla `default`:
     
-    * W trzeciej kolumnie opis problemu  
-    
-    * W czwartej kolumnie status zgłoszenia  
-
-* Dodać w evencie `onmessage` obsługę akcji analogicznie do serwera  
-
-* Dodać do aplikacji obiekt reprezentacyjny stan globalny 
-
-  * Stan na razie zawiera tylko pole `issues` na listę zgłoszeń z wartością inicjalna - pusta lista 
-
-* Po zalogowaniu trenera wyświetlić ekran listy zgłoszeń  
-
-  P* rzekazać do ekranu dane ze stanu globalnego  
-
-* Dodać obsługę akcji `ISSUES` 
-
-  * Zaktualizować listę zgłoszeń w stanie globalnym  
-
-
-## 7. Odpowiedź na zgłoszenie  
-
-### Klient: 
-
-* Dodać do listy zgłoszeń czwartą kolumnę wyświetlającą nazwę trenera, który przyjął zgłoszenie  
-
-  * W odpowiedzi zostanie dodane pole `trainerName` 
-
-  * Dodać do listy zgłoszeń piątą kolumnę z przyciskiem `Przyjęte` 
-
-* Po kliknięciu wysłać event z akcją `ISSUE_TAKEN` z `payload` o wartości `issueId` 
+      * do elementu `takeIssueButtonNode` dodać klasę `hide` wykorzystując `.classList.add('hide')`
+      
 
 ### Serwer: 
+
+* Dodać obsługę akcji `ISSUE_TAKEN`
+
+  * Znaleźć w kolekcji zgłoszenie wykorzystując `payload` zawierający identyfikator zgłoszenia i zapisać do stałej `issue`
+    
+    * `userId` zgłoszenia równe `payload`
+        
+    * `status` różne od `SOLVED`
+   
+    * Jeśli się nie udało przerwać `switch`
+  
+      * `if (!issue) break;`
+      
+  * Zmienić status zgłoszenia na `TAKEN`
+  
+    * Zauktualizować wartość przez referencję
+
+  * Wysłać akcje `ISSUES` do wszystkich trenerów z nową listą zgłoszeń
+
+## 7. Problem rozwiązany  
+
+Obsłużyć rozwiązanie problemu.
+
+### Serwer: 
+
+* Dodać do akcji `ISSUE_TAKEN` odesłanie do użytkownika eventu z przyjęciem zgłoszenia
+
+  * Znaleźć użytkownika wykorzystując `issue.userId` i zapisać do stałej `participant`
+  
+  * Jeśli nie znaleziono użytkownika przerwać `swtich` przy użyciu `break`
+  
+  * Wysłać do znalezionego użytkownika event z akcją `ISSUE_TAKEN` i `payload` zawierającym nazwę trenera, który przyjął zgłoszenie `connectedUser.data.name`
+   
+
+### Klient: 
 
 * Dodać obsługę akcji `ISSUE_TAKEN` 
 
-  * Znaleźć w kolekcji zgłoszenie wykorzystując `payload` zawierający identyfikator zgłoszenia  
+  * Wywołać `renderIssueTakenView` z `payload` zawierającym nazwę trenera, który przyjął zgłoszenie
 
-  * Zmienić status zgłoszenia na `TAKEN` 
+* Dodać na ekranie przyjętego zgłoszenia (`renderIssueTakenView`) 
 
-  * Wysłać akcje `ISSUE_LIST` do wszystkich trenerów 
+  * Znaleźć element o `id="issueTakenHeader"`
+  
+    * Ustawić pole `textContent` na `Trener ${trainerName} przyjął Twoje zgłoszenie, zaraz podejdzie.`
 
-## 8. Trener w drodze 
+  * Dodać nasłuchiwanie na kliknięcie w przycisk `Problem rozwiązany`
+
+    * Po kliknięciu wysłać event z akcją `ISSUE_SOLVED` z `payload` bez `payload`
+
+  * Zmienić na ekran zgłaszania problemu (`renderIssueSubmitView`)
+
 
 ### Serwer: 
 
-* Dodać do obsługi akcji `ISSUE_TAKEN` wysyłanie akcji `TRAINER_ON_WAY` z `payload` z wartością nazwy trenera, który odebrał zgłoszenie do uczestnika, który zgłosił problem  
-
-### Klient: 
-
-* Dodać do stanu globalnego pole `myIssue` reprezentujące zgłoszenie w postaci: 
-
-  * `status` - status zgłoszenia  
+  * Dodać obsługę akcji `ISSUE_SOLVED`
   
-  * `trainerName` - nazwa trenera, który przyjął zgłoszenie 
-
-  * Inicjalnie pole ma wartość `null` 
-
-* Dodać ekran zgłoszenia uczestnika 
-
-  * Po utworzeniu zgloszenia ekran prezentuje tekst `Oczekiwanie na przyjęcie zgłoszenia` - `status` zgłoszenia ma wartość `RECEIVED` 
-
-  * Dla statusu `TRAINER_ON_WAY` wyświetlić tekst `Traner Xxx jest w drodze do Ciebie` 
-
-* Po wysłaniu zgłoszenia: 
-
-  * Ustawić dane w stanie globalnym 
-
-  * Zmienić na ekran zgłoszenia uczestnika  
-
-
-## 9. Problem rozwiązany  
-
-### Klient: 
-
-* Dodać do stanu globalnego pole `issueId` inicjalnie równe `null` 
-
-* Dodać obsługę akcji `ISSUE_RECEIVED` 
-
-  * Zawartość `payload` ustawić jako wartość pola `issueId` 
-
-* Dodać na ekranie zgłoszenia przycisk `Problem rozwiązany`  
-
-  * Po kliknięciu wysłać event z akcją `ISSUE_SOLVED` z `payload` z wartością `issueId`  
-
-  * Zmienić na ekran zgłaszania problemu  
-
-### Serwer: 
-
-* Po przyjęciu zgłoszenia odesłać akcje `ISSUE_RECEIVED` z `payload` z wartością identyfikatora utworzonego zgłoszenia 
-
-  * Dodać obsługę akcji `ISSUE_SOLVED` 
-  
-  * Wykorzystać identyfikator  z `payload` do odnalezienia zgłoszenia i aktualizacji statusu zgłoszenia na `SOLVED` 
-
-
-## 10. Pomoc przez wiadomość  
-
-### Klient: 
-
-* Dodać do stanu globalnego pole `hint` o wartości inicjalnej `null` 
-
-* Dodać obsługę akcji `HINT`  
-
-  * Ustawić wartość `payload` wartości pola `hint` w stanie globalnym  
-
-* Na ekranie zgłoszenia jeśli `hint` nie jest puste wyświetlić: 
-
-  * Wiadomość od trenera  
-  
-  * Przyciski: 
-  
-    * `Pomogło` 
-      
-      * Po kliknięciu wysyłać akcje `ISSUE_SOLVED` 
-      
-      * Wyświetlić ekran zgłaszania problemu 
-      
-      * Ustawić wartość pola `hint` na `null` 
-      
-    * `Nie pomogło` 
+    * Akcja działa analogicznie do akcji `ISSUE_TAKEN` z tymi różnicami:
     
-      * Po kliknięciu wysłać akcję `HINT_FAIL` z `payload` z wartością `issueId` 
+      * Nie wysyłamy żadnego eventu do uczestnika, którego dotyczyło zgłoszenie
       
-      * Ustawić wartość pola `hint` na `null` 
+      * Status zgłoszenia zmienić na `SOLVED`
 
-* Rozszerzyć strukturę reprezentującą zgłoszeniu na liście o pole `hint` 
 
-* Na ekranie listy zgłoszeń dodać szósta kolumnę z `textarea` na opis rozwiązania problemu oraz przycisk `wyślij` 
+## 8. Pomoc przez wiadomość  
 
-  * Po kliknięciu wysłać event z akcją `HINT` z `payload` z wartością `textarea` 
+### Klient: 
 
-Serwer: 
+* Na ekranie trenera, podczas iteracji po zgłoszeniach dodać referencję do formularza ze wskazówką
 
-* Dodać obsługę akcji `HINT` 
+  * `const issueListHintFormNode = issueListItemNode.querySelector('.issueListHintForm');`
+  
+  * Dodać na formularzu nasłuchiwanie na event `submit`
+  
+    * Zablokować domyśle zachowanie eventu
+    
+      * `event.preventDefault();`
+      
+    * Zebrać dane z formularza
+      
+      * `const formData = new FormData(event.target);`
+      
+    * Wysłać event z akcją `HINT_SENT` i `payload` w postaci:
+    
+      * `hint` - wartość z pola formularza `hint`
+      
+      * `userId` - identyfikator użytkowanika (`it.userId`)
+      
+  * Zadbać o ukrywanie formularza gdy status równy `TAKEN`
+  
+    * Dodać nowy `case` dla statusu o wartości `TAKEN`
+    
+    * Ukryć element formularza dodając do niego klasę `hide`
+    
+  * Ukryć formularz domyślnie oraz kiedy status zgłoszenia równy `PENDING`
+  
+### Server:
 
-* Dodać obsługę akcji `HINT_FAIL` 
+* Dodać obsługę akcji `HINT_SENT`
 
+  * Znaleźć uczestnika wykorzystująć `payload.userId`
+  
+    * Jeśli nie znaleziono przerwać `switch`
+    
+  * Znaleźć aktywne zgłoszenie uczestnika
+  
+    * `userId` zgłoszenia równe `participant.id`
+    
+    * `status` różne od `SOLVED`
+    
+    * Jeśli nie znaleziono przerwać `switch`
+    
+  * Wysłać do uczestnika event z akcją `HINT_REVIED` i `payload` równym `payload.id`
+  
+  * Zmienić status zgłoszenia na `HINT`
+  
+  * Wysłać do wszystkich trenerów zmienioną listę zgłoszeń
+  
+### Klient:
+
+* Dodać obsługę akcji `HINT_RECEIVED`
+
+  * Wyświetlić ekran podpowiedzi (`renderHintReceivedView`)
+  
+    * Przekazać `payload` do ekranu
+    
+  * Na ekranie podpowiedzi
+  
+    * Wyświetlić treść podpowiedzi dostępnej w argumencie funkcji ekranu `hint`
+    
+      * Znaleźć element o `id="hint"` i ustawić `textContent` na zawartość podpowiedzi
+  
+    * Dodać nasłuchiwanie na kliknięcie na element o `id="hintSuccess"`
+    
+      * Wysłać event z akcją `ISSUE_SOLVED`
+      
+      * Wyświetlić ekran zgłaszania (`renderIssueReceivedView`)
+  
+    * Dodać nasłuchiwanie na kliknięcie na element o `id="hintFail"`
+    
+      * Wysłać event z akcją `HINT_FAIL`
+      
+      * Wyświetlić ekran oczekiwania na trenera (`renderIssueReceivedView`)
+      
+### Serwer:
+
+* Dodać obsługę akcji `HINT_FAIL`
+
+  * Znaleźć aktywne zgłoszenie uczestnika
+  
+    * `userId` zgłoszenia równe `connectedUser.id`
+    
+    * `status` różne od `SOLVED`
+    
+    * Jeśli nie znaleziono przerwać `switch`
+    
+  * Zmienić status zgłoszenia na `HINT`
+    
+  * Wysłać do wszystkich trenerów zmienioną listę zgłoszeń
+
+* Obsługa rozłączenia użytkownika
+
+  * Po rozłączeniu (event `close`) usunąc rozłączonego użytkownika
+  
+    * Przefiltrować kolekcję `state.participants` porównując `socket`
+    
+      * Wynikiem filtrowania nadpisać kolekcję
+      
+    * Przefiltrować kolekcję `state.trainers` porównując `socket`
+    
+      * Wynikiem filtrowania nadpisać kolekcję
+
+## Wyzwania
+
+ * Dodać walidację czy użytkownik o danej nazwie już istnieje
  
+ * Wyświetlić listę uczestnik na ekranie zgłoszeń trenera
+ 
+ * Dodać więcej danych do tabeli zgłoszeń:
+ 
+  * Data zgłoszenia i data ostatniej modyfikacji
+  
+  * Nazwa trenera, który przyjął zgłoszenie
+  
+  * Dodać ekran `Moje zgłoszenia`, który by wyświetlał się po zalogowaniu uczestnika i po rozwiązaniu problemu
+  
+    * Na ekranie przycisk `Nowe zgłoszenie` do przejścia na ekran zgłaszania pomocy
+    
+  * Dodać obsługę ponownego połączenia użytkownika
+   
 
  
 

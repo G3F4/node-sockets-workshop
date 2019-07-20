@@ -22,9 +22,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const formData = new FormData(event.target);
 
-      sendAction('PARTICIPANT_LOGIN', {
-        name: formData.get('name'),
-        group: formData.get('group'),
+      sendEvent({
+        action: 'PARTICIPANT_LOGIN',
+        payload: {
+          name: formData.get('name'),
+          group: formData.get('group'),
+        },
       });
     });
   };
@@ -36,8 +39,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const formData = new FormData(event.target);
 
-      sendAction('TRAINER_LOGIN', {
-        name: formData.get('name'),
+      sendEvent({
+        action: 'TRAINER_LOGIN',
+        payload: {
+          name: formData.get('name'),
+        },
       });
     });
   };
@@ -49,8 +55,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const formData = new FormData(event.target);
 
-      sendAction('TRAINER_NEEDED', {
-        problem: formData.get('problem'),
+      sendEvent({
+        action: 'TRAINER_NEEDED',
+        payload: {
+          problem: formData.get('problem'),
+        },
       });
     });
   };
@@ -61,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderTemplateById('issueTaken');
 
     getNodeById('issueSolved').addEventListener('click', () => {
-      sendAction('ISSUE_SOLVED');
+      sendEvent({ action: 'ISSUE_SOLVED' });
       renderIssueSubmitView();
     });
 
@@ -70,16 +79,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const renderHintReceivedView = hint => {
     renderTemplateById('hintReceived');
 
+    getNodeById('hint').textContent = hint;
+
     getNodeById('hintSuccess').addEventListener('click', () => {
-      sendAction('ISSUE_SOLVED');
+      sendEvent({ action: 'ISSUE_SOLVED' });
       renderIssueSubmitView();
     });
     getNodeById('hintFail').addEventListener('click', () => {
-      sendAction('HINT_FAIL');
+      sendEvent({ action: 'HINT_FAIL' });
       renderIssueReceivedView();
     });
-
-    getNodeById('hint').textContent = hint;
   };
   const renderTrainerDashboardView = data => {
     renderTemplateById('trainerDashboard');
@@ -103,48 +112,65 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const formData = new FormData(event.target);
 
-        sendAction('HINT_SENT', {
-          hint: formData.get('hint'),
-          userId: it.userId,
+        sendEvent({
+          action: 'HINT_SENT',
+          payload: {
+            hint: formData.get('hint'),
+            userId: it.userId,
+          },
         });
       });
 
-      if (it.status === 'PENDING') {
-        takeIssueButtonNode.addEventListener('click', () => {
-          sendAction('ISSUE_TAKEN', it.id);
-        });
-        issueListHintFormNode.classList.add('hide');
-      } else if (it.status === 'TAKEN') {
-        takeIssueButtonNode.classList.add('hide');
-      } else if (it.status === 'SOLVED') {
-        takeIssueButtonNode.classList.add('hide');
-        issueListHintFormNode.classList.add('hide');
-      } else {
-        takeIssueButtonNode.classList.add('hide');
-        issueListHintFormNode.classList.add('hide');
+      switch (it.status) {
+        case 'PENDING': {
+          takeIssueButtonNode.addEventListener('click', () => {
+            sendEvent({
+              action: 'ISSUE_TAKEN',
+              payload: it.id,
+            });
+          });
+
+          issueListHintFormNode.classList.add('hide');
+
+          break;
+        }
+        case 'TAKEN': {
+          takeIssueButtonNode.classList.add('hide');
+
+          break;
+        }
+        default: {
+          takeIssueButtonNode.classList.add('hide');
+          issueListHintFormNode.classList.add('hide')
+        }
       }
     });
   };
 
   renderLandingView();
 
-  const socketProtocol = location.protocol === 'https:' ? 'wss': 'ws';
-  const href = document.location.href.split('//')[1];
-  const params = `userId:${window.localStorage.getItem('userId')}`;
-  const ws = new WebSocket(`${socketProtocol}://${href}?${params}`);
-  const sendAction = (action, payload) => {
-    ws.send(JSON.stringify({ action, payload }));
+  const socket = new WebSocket('ws://localhost:5000');
+  const sendEvent = event => {
+    try {
+      socket.send(JSON.stringify(event));
+    }
+
+    catch (e) {
+      console.error(e);
+    }
   };
 
-  ws.onopen = event => {
-    console.info(['WebSocket.onopen'], event);
+  socket.onopen = event => {
+    console.log(['WebSocket.onopen'], event);
   };
-  ws.onclose = event => {
-    console.info(['WebSocket.onclose'], event);
+
+  socket.onclose = event => {
+    console.log(['WebSocket.onclose'], event);
   };
-  ws.onmessage = event => {
+
+  socket.onmessage = event => {
+    console.log(['WebSocket.onmessage'], event.data);
     const { action, payload } = JSON.parse(event.data);
-    console.info(['WebSocket.onmessage'], { action, payload });
 
     switch (action) {
       case 'PARTICIPANT_LOGGED': {
@@ -163,17 +189,18 @@ document.addEventListener('DOMContentLoaded', () => {
         renderIssueTakenView(payload);
         break;
       }
-      case 'HINT_RECEIVED': {
-        renderHintReceivedView(payload);
-        break;
-      }
       case 'ISSUES': {
         renderTrainerDashboardView(payload);
         break;
       }
+      case 'HINT_RECEIVED': {
+        renderHintReceivedView(payload);
+        break;
+      }
     }
   };
-  ws.onerror = event => {
+
+  socket.onerror = event => {
     console.error(['WebSocket.onerror'], event);
   };
 });

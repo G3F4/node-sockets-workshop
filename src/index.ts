@@ -20,31 +20,23 @@ const FILE_EXTENSION_TO_CONTENT_TYPE: FileExtensionToContentTypeMap = {
   js: 'text/javascript',
 };
 
-const server = http.createServer( (req, res) => {
+const server = http.createServer( (request, response) => {
   try {
-    const url = req.url && req.url !== '/' ? req.url : '/index.html';
+    const url = request.url && request.url !== '/' ? request.url : '/index.html';
     const urlParts = url.split('.');
     const fileExtension = urlParts[urlParts.length - 1] as StaticFileExtension;
     const contentType = FILE_EXTENSION_TO_CONTENT_TYPE[fileExtension];
 
-    res.writeHead(200, { 'Content-Type': contentType });
+    response.writeHead(200, { 'Content-Type': contentType });
 
     const file = readFileSync(`${process.cwd()}/public${url}`);
 
-    res.end(file);
+    response.end(file);
   } catch (e) {
     console.error(`error: ${e.toString()}`);
-    res.end(e.toString());
+    response.end(e.toString());
   }
 });
-
-const state: State = {
-  participants: [],
-  trainers: [],
-  issues: [],
-};
-
-const webSocketsServer = new WebSocket.Server({ server });
 
 const sendEvent = (socket: WebSocket, event: Event): void => {
   try {
@@ -56,7 +48,17 @@ const sendEvent = (socket: WebSocket, event: Event): void => {
   }
 };
 
+const state: State = {
+  participants: [],
+  trainers: [],
+  issues: [],
+};
+
+const webSocketsServer = new WebSocket.Server({ server });
+
 webSocketsServer.on('connection', (socket: WebSocket) => {
+  console.log('socket connected');
+
   const connectedUser: User = {
     id: `user-id-${Date.now()}`,
     data: {
@@ -67,6 +69,7 @@ webSocketsServer.on('connection', (socket: WebSocket) => {
   };
 
   socket.on('message', message => {
+    console.log(['socket message'], message);
     const { action, payload } = JSON.parse(message.toString());
 
     switch (action as Action) {
@@ -90,8 +93,6 @@ webSocketsServer.on('connection', (socket: WebSocket) => {
         break;
       }
       case 'TRAINER_NEEDED': {
-        if (!connectedUser) break;
-
         state.issues = [...state.issues, {
           id: `issue-id-${Date.now()}`,
           problem: payload.problem,
@@ -100,8 +101,6 @@ webSocketsServer.on('connection', (socket: WebSocket) => {
           userName: connectedUser.data.name,
           userGroup: connectedUser.data.group,
         }];
-
-        connectedUser.socket.send(JSON.stringify({ action: 'ISSUE_RECEIVED' }));
 
         sendEvent(connectedUser.socket, { action: 'ISSUE_RECEIVED' });
 
@@ -115,9 +114,9 @@ webSocketsServer.on('connection', (socket: WebSocket) => {
         break;
       }
       case 'ISSUE_TAKEN': {
-        const issue = state.issues.find(it => it.id === payload);
+        const issue = state.issues.find(it => it.id === payload && it.status !== 'SOLVED');
 
-        if (!issue || !connectedUser) break;
+        if (!issue) break;
 
         const participant = state.participants.find(it => it.id === issue.userId);
 
@@ -140,19 +139,17 @@ webSocketsServer.on('connection', (socket: WebSocket) => {
         break;
       }
       case 'ISSUE_SOLVED': {
-        if (!connectedUser) break;
-
-        const issue = state.issues.find(it => it.userId === connectedUser.id);
+        const issue = state.issues.find(it => it.userId === connectedUser.id && it.status !== 'SOLVED');
 
         if (!issue) break;
 
         issue.status = 'SOLVED';
 
         state.trainers.forEach(({ socket }) => {
-          socket.send(JSON.stringify({
+          sendEvent(socket, {
             action: 'ISSUES',
             payload: state.issues,
-          }));
+          });
         });
 
         break;
@@ -162,30 +159,28 @@ webSocketsServer.on('connection', (socket: WebSocket) => {
 
         if (!participant) break;
 
-        const issue = state.issues.find(it => it.userId === participant.id);
+        const issue = state.issues.find(it => it.userId === participant.id && it.status !== 'SOLVED');
 
         if (!issue) break;
 
-        participant.socket.send(JSON.stringify({
+        sendEvent(participant.socket, {
           action: 'HINT_RECEIVED',
           payload: payload.hint,
-        }));
+        });
 
         issue.status = 'HINT';
 
         state.trainers.forEach(({ socket }) => {
-          socket.send(JSON.stringify({
+          sendEvent(socket, {
             action: 'ISSUES',
             payload: state.issues,
-          }));
+          })
         });
 
         break;
       }
       case 'HINT_FAIL': {
-        if (!connectedUser) break;
-
-        const issue = state.issues.find(it => it.userId === connectedUser.id);
+        const issue = state.issues.find(it => it.userId === connectedUser.id && it.status !== 'SOLVED');
 
         if (!issue) break;
 
@@ -207,6 +202,7 @@ webSocketsServer.on('connection', (socket: WebSocket) => {
   });
 
   socket.on('close', () => {
+    console.log('socket closed');
     state.participants = state.participants.filter(user => user.socket !== socket);
     state.trainers = state.trainers.filter(user => user.socket !== socket);
   });

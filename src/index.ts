@@ -203,6 +203,8 @@ webSocketsServer.on('connection', (socket: WebSocket) => {
 
   socket.on('close', () => {
     console.log('socket closed');
+    state.participants = state.participants.filter(user => user.socket !== socket);
+    state.trainers = state.trainers.filter(user => user.socket !== socket);
   });
 });
 

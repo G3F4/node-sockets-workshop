@@ -263,6 +263,16 @@ const connectedUser: User = {
         * Dodać połączonego użytkownika do kanału uczestników `state.trainers`
         
         * Wysłać akcję `TRAINER_LOGGED` z pustym `payload` 
+        
+* Po rozłączeniu (event `close`) usunąc rozłączonego użytkownika
+
+  * Przefiltrować kolekcję `state.participants` porównując `socket`
+  
+    * Wynikiem filtrowania nadpisać kolekcję
+    
+  * Przefiltrować kolekcję `state.trainers` porównując `socket`
+  
+    * Wynikiem filtrowania nadpisać kolekcję
 
 ## 4. Wysyłanie sygnału pomocy 
 

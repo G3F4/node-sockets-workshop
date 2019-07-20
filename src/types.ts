@@ -17,7 +17,7 @@ export type Action = 'PARTICIPANT_LOGIN'
   | 'ISSUE_TAKEN'
   | 'ISSUE_SOLVED'
   | 'HINT_SENT'
-  | 'HINT_RECEIVED'
+  | 'HINT'
   | 'HINT_FAIL'
   | 'ISSUES'
 ;

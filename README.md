@@ -402,7 +402,15 @@ switch (action) {
   
       * `if (!issue) break;`
 
+  * Znaleźć w uczestnika wykorzystując obiekt zgłoszenia zawierający identyfikator uczestnika `issue.userId` i zapisać do stałej `partcipant`
+  
+    * Jeśli się nie udało przerwać `switch`
+  
+      * `if (!participant) break;`
+
   * Zmienić status zgłoszenia na `TAKEN` 
+  
+    * Zauktualizować wartość przez referencję
 
   * Wysłać akcje `ISSUES` do wszystkich trenerów z nową listą zgłoszeń
 

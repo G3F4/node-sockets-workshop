@@ -113,6 +113,31 @@ webSocketsServer.on('connection', (socket: WebSocket) => {
 
         break;
       }
+      case 'ISSUE_TAKEN': {
+        const issue = state.issues.find(it => it.id === payload);
+
+        if (!issue) break;
+
+        const participant = state.participants.find(it => it.id === issue.userId);
+
+        if (!participant) break;
+
+        sendEvent(participant.socket, {
+          action: 'ISSUE_TAKEN',
+          payload: connectedUser.data && connectedUser.data.name,
+        });
+
+        issue.status = 'TAKEN';
+
+        state.trainers.forEach(({ socket }) => {
+          sendEvent(socket, {
+            action: 'ISSUES',
+            payload: state.issues,
+          });
+        });
+
+        break;
+      }
       default: {
         console.error('unknown action');
       }

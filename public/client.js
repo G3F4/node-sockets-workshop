@@ -80,12 +80,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     data.forEach(it => {
       const issueListItemNode = document.importNode(issueListItemTemplate.content, true);
+      const takeIssueButtonNode = issueListItemNode.querySelector('.issueListItemActions button');
 
       issueListItemNode.querySelector('.issueListItemName').textContent = it.userName;
       issueListItemNode.querySelector('.issueListItemGroup').textContent = it.userGroup;
       issueListItemNode.querySelector('.issueListItemProblem').textContent = it.problem;
       issueListItemNode.querySelector('.issueListItemStatus').textContent = it.status;
       issueListNode.appendChild(issueListItemNode);
+
+      switch (it.status) {
+        case 'PENDING': {
+          takeIssueButtonNode.addEventListener('click', () => {
+            sendEvent({
+              action: 'ISSUE_TAKEN',
+              payload: it.id,
+            });
+          });
+
+          break;
+        }
+        default: {
+          takeIssueButtonNode.classList.add('hide');
+        }
+      }
     });
   };
 

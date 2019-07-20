@@ -374,23 +374,37 @@ switch (action) {
 
 ### Klient: 
 
-* Dodać do listy zgłoszeń czwartą kolumnę wyświetlającą nazwę trenera, który przyjął zgłoszenie  
+* Na ekranie listy zgłoszeń, podczas iteracji po zgłoszenia
 
-  * W odpowiedzi zostanie dodane pole `trainerName` 
-
-  * Dodać do listy zgłoszeń piątą kolumnę z przyciskiem `Przyjęte` 
-
-* Po kliknięciu wysłać event z akcją `ISSUE_TAKEN` z `payload` o wartości `issueId` 
+  * Dodać referenję do przycisku `Przyjmij zgłoszenie`
+  
+    * `const takeIssueButtonNode = issueListItemNode.querySelector('.issueListItemActions button');`
+  
+  * Dodać `switch` pracujący na statusie zgłoszenia `it.status` po `issueListNode.appendChild(issueListItemNode);`
+    
+    * Dla statusu `PENDING`:
+    
+      * Dodać nasłuchiwanie na kliknięcie na elemencie `takeIssueButtonNode`
+      
+        * W odpowiedzi na kliknięcie wysłać event z akcją `ISSUE_TAKEN` z identyfikatorem zgłoszenia `it.id` jako `payload`
+        
+    * dla `default`:
+    
+      * do elementu `takeIssueButtonNode` dodać klasę `hide' wykorzystując `.classList.add('hide')`
 
 ### Serwer: 
 
 * Dodać obsługę akcji `ISSUE_TAKEN` 
 
-  * Znaleźć w kolekcji zgłoszenie wykorzystując `payload` zawierający identyfikator zgłoszenia  
+  * Znaleźć w kolekcji zgłoszenie wykorzystując `payload` zawierający identyfikator zgłoszenia i zapisać do stałej `issue`
+  
+    * Jeśli się nie udało przerwać `switch`
+  
+      * `if (!issue) break;`
 
   * Zmienić status zgłoszenia na `TAKEN` 
 
-  * Wysłać akcje `ISSUE_LIST` do wszystkich trenerów 
+  * Wysłać akcje `ISSUES` do wszystkich trenerów z nową listą zgłoszeń
 
 ## 7. Trener w drodze 
 

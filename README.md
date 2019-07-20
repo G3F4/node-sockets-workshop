@@ -230,6 +230,10 @@ const sendEvent = (action, payload) => {
 
 ### Serwer 
 
+* Usunąć wysłanie wiadomości powitalnej
+
+  * `socket.send('welcome');`
+
 * Dodać obiekt na poziomie pliku, który będzie reprezentował stan serwera
 
   * Obiekt zawiera dwie kolekcje zawierające podłączonych użytkowników

@@ -1,5 +1,16 @@
 # warsawjs-workshop-34-trainer-needed
 
+## 0. Przygotowanie do warszatatów:
+
+  * Sklonuj repozytorium
+  
+  * Zainstalouj zależności 
+  
+    * `yarn` albo `npm i`
+    
+  * Zmień branch na `etap-0`
+
+
 ## 1. Serwer http z plikami statycznymi
 
 Do rozpoczęcia pracy potrzebny jest serwer obsługujący protokuł http. 
@@ -63,6 +74,10 @@ Dodać prosty serwer serwujący pliku statyczne z folderu `public`.
 
   * Wykorzystując metodę `response.end` zakończyć zapytanie przekazując do metody zawartość wczytanego pliku  
   
+  
+[Rozwiązanie](https://github.com/G3F4/warsawjs-workshop-34-trainer-needed/compare/etap-0...etap-1?expand=1)
+  
+  
 ## 2. Dodanie WebSocketów 
 
 Ustanowić stałe połaączenie pomiędzy klientem a serwerem wykorzystując WebSockety
@@ -117,6 +132,10 @@ Ustanowić stałe połaączenie pomiędzy klientem a serwerem wykorzystując Web
     * `onclose` - wywoływany w sytuacji kiedy serwer zakończy połączenie z socketem 
 
       * W reakcji na event: `console.log(['WebSocket.onclose'], event);`  
+
+
+[Rozwiązanie](https://github.com/G3F4/warsawjs-workshop-34-trainer-needed/compare/etap-1...etap-2?expand=1)
+
 
 ## 3. Autentykacja użytkownika 
 
@@ -265,6 +284,9 @@ const connectedUser: User = {
         * Wysłać akcję `TRAINER_LOGGED` z pustym `payload` 
 
 
+[Rozwiązanie](https://github.com/G3F4/warsawjs-workshop-34-trainer-needed/compare/etap-2...etap-3?expand=1)
+
+
 ## 4. Wysyłanie sygnału pomocy 
 
 ### Klient: 
@@ -315,6 +337,10 @@ switch (action) {
   * W odpowiedzi na event dodać nowy element do kolekcji zgłoszeń  
   
   * Wysłać do użytkownika event z akcją `ISSUE_RECEIVED` i pustym `payload`
+
+
+[Rozwiązanie](https://github.com/G3F4/warsawjs-workshop-34-trainer-needed/compare/etap-3...etap-4?expand=1)
+
 
 ## 5. Wyświetlanie zgłoszeń  
 
@@ -371,6 +397,10 @@ switch (action) {
     
       * `issueListNode.appendChild(issueListItemNode);`
 
+
+[Rozwiązanie](https://github.com/G3F4/warsawjs-workshop-34-trainer-needed/compare/etap-4...etap-5?expand=1)
+
+
 ## 6. Przyjęcie zgłoszenia
 
 Dodać obsługę przyjęcia zgłoszenia przez trenera.
@@ -416,6 +446,10 @@ Dodać obsługę przyjęcia zgłoszenia przez trenera.
 
   * Wysłać akcje `ISSUES` do wszystkich trenerów z nową listą zgłoszeń
 
+
+[Rozwiązanie](https://github.com/G3F4/warsawjs-workshop-34-trainer-needed/compare/etap-5...etap-6?expand=1)
+
+
 ## 7. Problem rozwiązany  
 
 Obsłużyć rozwiązanie problemu.
@@ -459,6 +493,9 @@ Obsłużyć rozwiązanie problemu.
       * Nie wysyłamy żadnego eventu do uczestnika, którego dotyczyło zgłoszenie
       
       * Status zgłoszenia zmienić na `SOLVED`
+
+
+[Rozwiązanie](https://github.com/G3F4/warsawjs-workshop-34-trainer-needed/compare/etap-6...etap-7?expand=1)
 
 
 ## 8. Pomoc przez wiadomość  
@@ -569,6 +606,10 @@ Obsłużyć rozwiązanie problemu.
     
       * Wynikiem filtrowania nadpisać kolekcję
 
+
+[Rozwiązanie](https://github.com/G3F4/warsawjs-workshop-34-trainer-needed/compare/etap-7...etap-8?expand=1)
+
+
 ## Wyzwania
 
  * Dodać walidację czy użytkownik o danej nazwie już istnieje
@@ -587,13 +628,3 @@ Obsłużyć rozwiązanie problemu.
     
   * Dodać obsługę ponownego połączenia użytkownika
    
-
- 
-
- 
-
- 
-
- 
-
- 

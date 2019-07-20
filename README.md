@@ -1,5 +1,8 @@
 # warsawjs-workshop-34-trainer-needed
 
+![alt text](https://www.pubnub.com/wp-content/uploads/2014/09/WebSockets-Diagram.png)
+https://www.pubnub.com/wp-content/uploads/2014/09/WebSockets-Diagram.png
+
 ## 0. Przygotowanie do warszatatów
 
   * Sklonować repozytorium

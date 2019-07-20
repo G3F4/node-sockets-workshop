@@ -13,10 +13,9 @@
 
 ## 1. Serwer http z plikami statycznymi
 
-Do rozpoczęcia pracy potrzebny jest serwer obsługujący protokuł http. 
-Dodać prosty serwer serwujący pliku statyczne z folderu `public`.
+Dodać prosty serwer HTTP serwujący pliki statyczne z folderu `public`.
 
-* Hello world serwera http (`/src/index.ts`)
+* Hello world serwera HTTP (`/src/index.ts`)
 
   * Utworzyć serwer przy wykorzystaniu funkcji `createServer` ze wbudowanego modułu `http` 
 
@@ -26,15 +25,17 @@ Dodać prosty serwer serwujący pliku statyczne z folderu `public`.
 
       * Dodać blok `try catch`, który obejmie cały kod handlera
         
-        * w przypadku błędu wyświetlić błąd do konsoli
+        * w przypadku błędu:
+         
+          * wyświetlić błąd do konsoli
         
-        * wysłać odpowiedź w postać `e.toString()` gdzie `e` to wyłapany błąd przez `catch`
+          * wysłać odpowiedź w postać `e.toString()` gdzie `e` to wyłapany błąd przez `catch`
       
       * Handler serwera w odpowiedzi na wszystkie zapytania zwraca tekst `Test server` 
       
         * Wykorzystać metodę `end` obiektu `response`
 
-  * Dodać nasłuchiwanie wykorzystując metodę `listen` obiektu `server`
+  * Dodać nasłuchiwanie serwera na porcie wykorzystując metodę `listen` obiektu `server`
     
     * Przekazać jako pierwszy argument stałą `PORT`
     
@@ -42,7 +43,7 @@ Dodać prosty serwer serwujący pliku statyczne z folderu `public`.
     
       * Użyć `console.log` aby sprawdzić czy serwer rozpoczął nasłuchiwanie na porcie
 
-* Modyfikacja handlera serwera, tak aby zwracał pliki statyczne 
+* Zmodyfikować handler serwera HTTP, tak aby zwracał pliki statyczne 
 
   * Zapisać do stałej `url` adres URL z obiektu zapytania wykorzystując `request.url` 
   
@@ -50,19 +51,19 @@ Dodać prosty serwer serwujący pliku statyczne z folderu `public`.
     
       * Wykorzystać operator `? :`
       
-  * Utworznie stałej `urlParts` z wartością `url.split('.')`
+  * Utworzyć stałą `urlParts` z wartością `url.split('.')`
 
-  * Utworznie stałej `fileExtension` z wartością ostatniego elementu tablicy `urlParts`
+  * Utworzyć stałą `fileExtension` z wartością ostatniego elementu tablicy `urlParts`
   
-  * Utworznie stałej `contentType` z wartością z mapy `FILE_EXTENSION_TO_CONTENT_TYPE`, której kluczami są rozszerzenia plików
+  * Utworzyć stałą `contentType` z wartością z mapy `FILE_EXTENSION_TO_CONTENT_TYPE`, której kluczami są rozszerzenia plików
 
-  * Ustawić status odpowiedzi wykorzystując metodę `writeHead` obiektu odpowiedzi (drugi argument handlera, zazwyczaj nazywany `res`) 
+  * Ustawić status odpowiedzi wykorzystując metodę `response.writeHead` obiektu odpowiedzi 
 
     * Jako pierwszy argument przekazać status odpowiedzi równy `200` 
 
     * Jako drugi argument przekazać obiekt `{ 'Content-Type': contentType }`
 
-  * Wczytanie pliku 
+  * Wczytać plik 
 
     * Wykorzystać funckje `readFileSync` ze wbudowanego modułu `fs`  
       
@@ -70,25 +71,25 @@ Dodać prosty serwer serwujący pliku statyczne z folderu `public`.
 
       * Jako pierwszy argument przekazać absolutną ścieżkę do pliku 
 
-        * Do pobrania ścieżki projektu możesz skorzystać z `proces.cwd()` 
+        * Do pobrania ścieżki projektu skorzystać z `proces.cwd()` 
 
-  * Wykorzystując metodę `response.end` zakończyć zapytanie przekazując do metody zawartość wczytanego pliku  
+  * Wykorzystać metodę `response.end` aby zakończyć zapytanie przekazując do metody zawartość wczytanego pliku  
   
   
-[Rozwiązanie](https://github.com/G3F4/warsawjs-workshop-34-trainer-needed/compare/etap-0...etap-1?expand=1)
+[Rozwiązanie](https://github.com/G3F4/warsawjs-workshop-34-trainer-needed/compare/etap-0...etap-1?diff=unified&expand=1)
   
   
 ## 2. Dodanie WebSocketów 
 
 Ustanowić stałe połaączenie pomiędzy klientem a serwerem wykorzystując WebSockety
 
-### Serwer: (`/src/index.ts`) 
+### Serwer (`/src/index.ts`) 
 
 * Utworzyć nową instancję serwera `new WebSocket.Server` o nazwie `webSocketsServer` 
 
   * Przekazać do konstruktora obiekt konfiguracyjny z kluczem `server`, wskazujący na referencje do serwera HTTP 
 
-* Dodać do serwera WebSockets nasłuchiwanie na `event` połączenia o nazwie `connection` przy wykorzystaniu metody `on` 
+* Dodać do serwera WebSockets nasłuchiwanie na event połączenia o nazwie `connection` przy wykorzystaniu metody `on` 
 
   * Klasa `Server` z pakietu `ws` dziedziczy do klasie `EventEmmiter` 
 
@@ -107,7 +108,7 @@ Ustanowić stałe połaączenie pomiędzy klientem a serwerem wykorzystując Web
   * Wypisać do konsoli `socket closed`
 
 
-### Klient: (`/public/client.js`) 
+### Klient (`/public/client.js`) 
 
 * W handlerze eventu `DOMContentLoaded` stworzyć nowe polaczeniem do serwera `WebSockets` 
 
@@ -134,14 +135,16 @@ Ustanowić stałe połaączenie pomiędzy klientem a serwerem wykorzystując Web
       * W reakcji na event: `console.log(['WebSocket.onclose'], event);`  
 
 
-[Rozwiązanie](https://github.com/G3F4/warsawjs-workshop-34-trainer-needed/compare/etap-1...etap-2?expand=1)
+[Rozwiązanie](https://github.com/G3F4/warsawjs-workshop-34-trainer-needed/compare/etap-1...etap-2?diff=unified&expand=1)
 
 
 ## 3. Autentykacja użytkownika 
 
-### Klient: 
+Obsłużyć logowanie użytkowników poprzez stworzenie obiektu reprezentującego użytkownika i dodanie go do odpowiedniej kolekcji, odpowiednio na uczestników oraz trenerów.
 
-* Dodać funckję do wysyłanie eventów:
+### Klient 
+
+* Dodać funkcję do wysyłania eventów do serwera WebSocket:
 
 ```javascript
 const sendEvent = (action, payload) => {
@@ -155,13 +158,13 @@ const sendEvent = (action, payload) => {
 };
 ```
 
-* Na ekranie powitalnym (funckja `renderLandingView`)
+* Na ekranie powitalnym (funkcja `renderLandingView`)
   
   * WAŻNE: `renderTemplateById` musi być zawsze wywołane w pierwszej kolejności, inaczej elementy ekranu nie będą wyrenderowane, nie będzie można z nimi nic zrobić
 
   * Dodać nasłuchiwanie na kliknięcie w element z `id="loginParticipant"` wykorzystując `addEventListener` oraz `getNodeById`
   
-    * Przekazać nową funkcję jako handler funckję `renderParticipantLoginView`
+    * Przekazać nową funkcję jako handler funkcję `renderParticipantLoginView`
   
   * Analogicznie zrobić dla elementu z `id="trainerParticipant"` 
 
@@ -192,54 +195,59 @@ const sendEvent = (action, payload) => {
 
 * Ekran logowania trenera 
 
-  * Wykonać analogicznie dla ekranu logowania uczestnika
+  * Wykonać analogicznie dla ekranu logowania uczestnika, z takimi różnicami
+  
+    * Akcja `TRAINER_LOGIN`
+    
+    * Wysłać tylko pole `name`
 
 ### Serwer 
 
 * Dodać obiekt na poziomie pliku, który będzie reprezentował stan serwera
 
-  * Obiekt zawiera dwie kolekcje, symulujące kanały
-```javascript
-const state: State = {
-  participants: [],
-  trainers: [],
-};
-```
-
-* Obiekt reprezentujący podłączonego użytkownika 
-
-  * `type` - `PARTICIPANT` lub `TRAINER` 
+  * Obiekt zawiera dwie kolekcje zawierające podłączonych użytkowników
   
-  * `data` - dane zebrane podczas logowania 
-  
-  * `socket` - referencja do socketa użytkownika 
-  
-* Na poziomie pliku dodać funckję wysyłające event dbającą o obsługę błędu
+  ```javascript
+  const state: State = {
+    participants: [],
+    trainers: [],
+  };
+  ```
 
-```javascript
-const sendEvent = (socket: WebSocket, event: Event): void => {
-  try {
-    socket.send(JSON.stringify(event));
-  }
+  * Obiekt reprezentujący podłączonego użytkownika 
+  
+    * `type` - `PARTICIPANT` lub `TRAINER` 
+    
+    * `data` - dane zebrane podczas logowania 
+    
+    * `socket` - referencja do socketa użytkownika 
+  
+* Na poziomie pliku dodać funkcję wysyłające event dbającą o obsługę błędu
 
-  catch (e) {
-    console.error(e);
-  }
-};
-```
+  ```javascript
+  const sendEvent = (socket: WebSocket, event: Event): void => {
+    try {
+      socket.send(JSON.stringify(event));
+    }
+  
+    catch (e) {
+      console.error(e);
+    }
+  };
+  ```
   
 * Po połączeniu (event `connection`) stworzyć w domknięciu stałą reprezentującą połączonego użytkownika
 
-```javascript
-const connectedUser: User = {
-  id: `user-id-${Date.now()}`,
-  data: {
-    name: '',
-    group: '',
-  },
-  socket,
-};
-```
+  ```javascript
+  const connectedUser: User = {
+    id: `user-id-${Date.now()}`,
+    data: {
+      name: '',
+      group: '',
+    },
+    socket,
+  };
+  ```
 
 * W evencie `message`:
 
@@ -284,39 +292,43 @@ const connectedUser: User = {
         * Wysłać akcję `TRAINER_LOGGED` z pustym `payload` 
 
 
-[Rozwiązanie](https://github.com/G3F4/warsawjs-workshop-34-trainer-needed/compare/etap-2...etap-3?expand=1)
+[Rozwiązanie](https://github.com/G3F4/warsawjs-workshop-34-trainer-needed/compare/etap-2...etap-3?diff=unified&expand=1)
 
 
 ## 4. Wysyłanie sygnału pomocy 
 
-### Klient: 
+Obsługa wysyłania sygnału pomocy przez uczestnika.
+
+### Klient 
 
 * W evencie `onmessage` dodać prosty system nasłuchiwania na akcje, analogiczny do tego z serwera
 
-```javascript
-switch (action) {
-      case 'PARTICIPANT_LOGGED': {
-        break;
-      }
+  ```javascript
+  switch (action) {
+    case 'PARTICIPANT_LOGGED': {
+      break;
     }
-```
+  }
+  ```
 
 * Dodać obługę akcji `PARTICIPANT_LOGGED`
 
-  * Wywołać funckję `renderIssueSubmitView`
+  * Wywołać funkcję `renderIssueSubmitView`
   
 * Dodać obsługę akcji `ISSUE_RECEIVED`
 
-  * Wywołać funckję `renderIssueReceivedView`
+  * Wywołać funkcję `renderIssueReceivedView`
   
-* Na ekranie zgłaszania sygnału pomocy
+* Na ekranie zgłaszania sygnału pomocy (`renderIssueSubmitView`)
   
   * Dodać obsługę eventu `submit` formularza o `id="issueSubmitForm"`
   
-    * Po kliknięciu wysłać event z `action` o wartości  `TRAINER_NEEDED` i `payload` z wartością inputa `problem`
+    * Zablokować domyślne działanie eventu `event.preventDefault();`
+  
+    * Wysłać event z `action` o wartości  `TRAINER_NEEDED` i `payload` z wartością inputa `problem`
      
 
-### Serwer: 
+### Serwer 
 
 * Dodać kolekcje reprezentującą zgłoszenia uczestników do stanu serwera pod kluczem `issues` w postaci: 
   
@@ -336,13 +348,15 @@ switch (action) {
   
   * W odpowiedzi na event dodać nowy element do kolekcji zgłoszeń  
   
-  * Wysłać do użytkownika event z akcją `ISSUE_RECEIVED` i pustym `payload`
+  * Wysłać do użytkownika event z akcją `ISSUE_RECEIVED`
 
 
-[Rozwiązanie](https://github.com/G3F4/warsawjs-workshop-34-trainer-needed/compare/etap-3...etap-4?expand=1)
+[Rozwiązanie](https://github.com/G3F4/warsawjs-workshop-34-trainer-needed/compare/etap-3...etap-4?diff=unified&expand=1)
 
 
 ## 5. Wyświetlanie zgłoszeń  
+
+Wyświetlić listę zgłoszeń na ekranie trenera.
 
 ### Serwer 
 
@@ -352,7 +366,7 @@ switch (action) {
   
   * Po wystąpieniu akcji `TRAINER_NEEDED` wysłać do wszystkich trenerów akcji `ISSUES` z `payload` jako wszystkie zgłoszenia
 
-### Klient: 
+### Klient 
     
 * Dodać obsługę akcji `ISSUES`
 
@@ -362,12 +376,13 @@ switch (action) {
 
   * wywołać funkcję `renderTrainerDashboardView` i przekazać jej `payload`
   
-* Dodać referencję do elementów o `issueListItem` i `issueList`
+* Dodać referencję do elementów z `id="issueListItem"` i `id="issueList"`
 
   ```javascript
   const issueListItemTemplate = getNodeById('issueListItem');
   const issueListNode = getNodeById('issueList');
   ```
+  
 * Przeiterować się z użyciem `forEach` po argumecie `data`, który jest tablicą zgłoszeń w postaci wysłanej przez serwer
 
   ```javascript
@@ -398,14 +413,14 @@ switch (action) {
       * `issueListNode.appendChild(issueListItemNode);`
 
 
-[Rozwiązanie](https://github.com/G3F4/warsawjs-workshop-34-trainer-needed/compare/etap-4...etap-5?expand=1)
+[Rozwiązanie](https://github.com/G3F4/warsawjs-workshop-34-trainer-needed/compare/etap-4...etap-5?diff=unified&expand=1)
 
 
 ## 6. Przyjęcie zgłoszenia
 
 Dodać obsługę przyjęcia zgłoszenia przez trenera.
 
-### Klient: 
+### Klient 
 
 * Na ekranie listy zgłoszeń, podczas iteracji po zgłoszenia
 
@@ -426,7 +441,7 @@ Dodać obsługę przyjęcia zgłoszenia przez trenera.
       * do elementu `takeIssueButtonNode` dodać klasę `hide` wykorzystując `.classList.add('hide')`
       
 
-### Serwer: 
+### Serwer 
 
 * Dodać obsługę akcji `ISSUE_TAKEN`
 
@@ -447,14 +462,14 @@ Dodać obsługę przyjęcia zgłoszenia przez trenera.
   * Wysłać akcje `ISSUES` do wszystkich trenerów z nową listą zgłoszeń
 
 
-[Rozwiązanie](https://github.com/G3F4/warsawjs-workshop-34-trainer-needed/compare/etap-5...etap-6?expand=1)
+[Rozwiązanie](https://github.com/G3F4/warsawjs-workshop-34-trainer-needed/compare/etap-5...etap-6?diff=unified&expand=1)
 
 
 ## 7. Problem rozwiązany  
 
 Obsłużyć rozwiązanie problemu.
 
-### Serwer: 
+### Serwer 
 
 * Dodać do akcji `ISSUE_TAKEN` odesłanie do użytkownika eventu z przyjęciem zgłoszenia
 
@@ -465,13 +480,13 @@ Obsłużyć rozwiązanie problemu.
   * Wysłać do znalezionego użytkownika event z akcją `ISSUE_TAKEN` i `payload` zawierającym nazwę trenera, który przyjął zgłoszenie `connectedUser.data.name`
    
 
-### Klient: 
+### Klient 
 
 * Dodać obsługę akcji `ISSUE_TAKEN` 
 
   * Wywołać `renderIssueTakenView` z `payload` zawierającym nazwę trenera, który przyjął zgłoszenie
 
-* Dodać na ekranie przyjętego zgłoszenia (`renderIssueTakenView`) 
+* Na ekranie przyjętego zgłoszenia (`renderIssueTakenView`) 
 
   * Znaleźć element o `id="issueTakenHeader"`
   
@@ -479,12 +494,12 @@ Obsłużyć rozwiązanie problemu.
 
   * Dodać nasłuchiwanie na kliknięcie w przycisk `Problem rozwiązany`
 
-    * Po kliknięciu wysłać event z akcją `ISSUE_SOLVED` z `payload` bez `payload`
+    * Wysłać event z akcją `ISSUE_SOLVED` z `payload` bez `payload`
 
-  * Zmienić na ekran zgłaszania problemu (`renderIssueSubmitView`)
+    * Zmienić na ekran zgłaszania problemu (`renderIssueSubmitView`)
 
 
-### Serwer: 
+### Serwer 
 
   * Dodać obsługę akcji `ISSUE_SOLVED`
   
@@ -495,16 +510,18 @@ Obsłużyć rozwiązanie problemu.
       * Status zgłoszenia zmienić na `SOLVED`
 
 
-[Rozwiązanie](https://github.com/G3F4/warsawjs-workshop-34-trainer-needed/compare/etap-6...etap-7?expand=1)
+[Rozwiązanie](https://github.com/G3F4/warsawjs-workshop-34-trainer-needed/compare/etap-6...etap-7?diff=unified&expand=1)
 
 
 ## 8. Pomoc przez wiadomość  
 
-### Klient: 
+### Klient 
 
-* Na ekranie trenera, podczas iteracji po zgłoszeniach dodać referencję do formularza ze wskazówką
+* Na ekranie trenera, podczas iteracji po zgłoszeniach
+ 
+  * Dodać referencję do formularza ze wskazówką
 
-  * `const issueListHintFormNode = issueListItemNode.querySelector('.issueListHintForm');`
+    * `const issueListHintFormNode = issueListItemNode.querySelector('.issueListHintForm');`
   
   * Dodać na formularzu nasłuchiwanie na event `submit`
   
@@ -552,7 +569,7 @@ Obsłużyć rozwiązanie problemu.
   
   * Wysłać do wszystkich trenerów zmienioną listę zgłoszeń
   
-### Klient:
+### Klient
 
 * Dodać obsługę akcji `HINT_RECEIVED`
 
@@ -578,7 +595,7 @@ Obsłużyć rozwiązanie problemu.
       
       * Wyświetlić ekran oczekiwania na trenera (`renderIssueReceivedView`)
       
-### Serwer:
+### Serwer
 
 * Dodać obsługę akcji `HINT_FAIL`
 
@@ -607,7 +624,7 @@ Obsłużyć rozwiązanie problemu.
       * Wynikiem filtrowania nadpisać kolekcję
 
 
-[Rozwiązanie](https://github.com/G3F4/warsawjs-workshop-34-trainer-needed/compare/etap-7...etap-8?expand=1)
+[Rozwiązanie](https://github.com/G3F4/warsawjs-workshop-34-trainer-needed/compare/etap-7...etap-8?diff=unified&expand=1)
 
 
 ## Wyzwania
@@ -627,4 +644,6 @@ Obsłużyć rozwiązanie problemu.
     * Na ekranie przycisk `Nowe zgłoszenie` do przejścia na ekran zgłaszania pomocy
     
   * Dodać obsługę ponownego połączenia użytkownika
+  
+  * Dodać testy integracyjne
    

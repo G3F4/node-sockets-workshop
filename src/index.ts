@@ -116,7 +116,7 @@ webSocketsServer.on('connection', (socket: WebSocket) => {
       case 'ISSUE_TAKEN': {
         const issue = state.issues.find(it => it.id === payload);
 
-        if (!issue || !connectedUser) break;
+        if (!issue) break;
 
         const participant = state.participants.find(it => it.id === issue.userId);
 
@@ -139,8 +139,6 @@ webSocketsServer.on('connection', (socket: WebSocket) => {
         break;
       }
       case 'ISSUE_SOLVED': {
-        if (!connectedUser) break;
-
         const issue = state.issues.find(it => it.userId === connectedUser.id);
 
         if (!issue) break;

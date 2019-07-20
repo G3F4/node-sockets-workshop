@@ -413,35 +413,41 @@ Dodać obsługę przyjęcia zgłoszenia przez trenera.
 
 ## 7. Problem rozwiązany  
 
-### Klient: 
-
-* Dodać obsługę akcji `ISSUE_RECEIVED` 
-
-  * Zawartość `payload` ustawić jako wartość pola `issueId` 
-
-* Dodać na ekranie zgłoszenia przycisk `Problem rozwiązany`  
-
-  * Po kliknięciu wysłać event z akcją `ISSUE_SOLVED` z `payload` z wartością `issueId`  
-
-  * Zmienić na ekran zgłaszania problemu  
+Obsłużyć rozwiązanie problemu.
 
 ### Serwer: 
 
-* W akcji `ISSUE_TAKEN`
+* Dodać do akcji `ISSUE_TAKEN` odesłanie do użytkownika eventu z przyjęciem zgłoszenia
 
-  * Znaleźć w uczestnika wykorzystując obiekt zgłoszenia zawierający identyfikator uczestnika `issue.userId` i zapisać do stałej `partcipant`
+  * Znaleźć użytkownika wykorzystując `issue.userId` i zapisać do stałej `participant`
   
-    * Jeśli się nie udało przerwać `switch`
+  * Jeśli nie znaleziono użytkownika przerwać `swtich` przy użyciu `break`
   
-      * `if (!participant) break;`
-      
-  * Wysłać do uczestnika akcję `ISSUE_TAKEN`
-    
-    * Jako `payload` ustawić nazwę trenera dostępną w `connectedUser.data.name`
+  * Wysłać do znalezionego użytkownika event z akcją `ISSUE_TAKEN` i `payload` zawierającym nazwę trenera, który przyjął zgłoszenie `connectedUser.data.name`
+   
 
-* Po przyjęciu zgłoszenia odesłać akcje `ISSUE_RECEIVED` z `payload` z wartością identyfikatora utworzonego zgłoszenia 
+### Klient: 
 
-  * Dodać obsługę akcji `ISSUE_SOLVED` 
+* Dodać obsługę akcji `ISSUE_TAKEN` 
+
+  * Wywołać `renderIssueTakenView` z `payload` zawierającym nazwę trenera, który przyjął zgłoszenie
+
+* Dodać na ekranie przyjętego zgłoszenia (`renderIssueTakenView`) 
+
+  * Znaleźć element o `id="issueTakenHeader"`
+  
+    * Ustawić pole `textContent` na `Trener ${trainerName} przyjął Twoje zgłoszenie, zaraz podejdzie.`
+
+  * Dodać nasłuchiwanie na kliknięcie w przycisk `Problem rozwiązany`
+
+    * Po kliknięciu wysłać event z akcją `ISSUE_SOLVED` z `payload` bez `payload`
+
+  * Zmienić na ekran zgłaszania problemu (`renderIssueSubmitView`)
+
+
+### Serwer: 
+
+  * Dodać obsługę akcji `ISSUE_SOLVED`
   
   * Wykorzystać identyfikator  z `payload` do odnalezienia zgłoszenia i aktualizacji statusu zgłoszenia na `SOLVED` 
 

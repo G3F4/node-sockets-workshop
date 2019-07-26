@@ -45,6 +45,8 @@ export interface Issue {
   userName: string;
   userGroup: string;
   problem: string;
+  trainerName: string;
+  hint: string;
 }
 
 export interface State {

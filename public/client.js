@@ -149,7 +149,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   renderLandingView();
 
-  const socket = new WebSocket('ws://localhost:5000');
+  const userId = localStorage.getItem('userId') || '';
+
+  const socket = new WebSocket(`ws://localhost:5000?userId=${userId}`);
   const sendEvent = event => {
     try {
       socket.send(JSON.stringify(event));
@@ -175,10 +177,12 @@ document.addEventListener('DOMContentLoaded', () => {
     switch (action) {
       case 'PARTICIPANT_LOGGED': {
         renderIssueSubmitView();
+        localStorage.setItem('userId', payload.userId);
         break;
       }
       case 'TRAINER_LOGGED': {
-        renderTrainerDashboardView(payload);
+        renderTrainerDashboardView(payload.issues);
+        localStorage.setItem('userId', payload.userId);
         break;
       }
       case 'ISSUE_RECEIVED': {
@@ -186,15 +190,15 @@ document.addEventListener('DOMContentLoaded', () => {
         break;
       }
       case 'ISSUE_TAKEN': {
-        renderIssueTakenView(payload);
+        renderIssueTakenView(payload.trainerName);
         break;
       }
       case 'ISSUES': {
-        renderTrainerDashboardView(payload);
+        renderTrainerDashboardView(payload.issues);
         break;
       }
       case 'HINT': {
-        renderHintReceivedView(payload);
+        renderHintReceivedView(payload.hint);
         break;
       }
     }

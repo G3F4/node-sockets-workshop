@@ -1,5 +1,6 @@
 import { readFileSync } from 'fs';
 import http from 'http';
+import url from 'url';
 import * as process from 'process';
 import * as WebSocket from 'ws';
 import {
@@ -56,10 +57,13 @@ const state: State = {
 
 const webSocketsServer = new WebSocket.Server({ server });
 
-webSocketsServer.on('connection', (socket: WebSocket) => {
+webSocketsServer.on('connection', (socket: WebSocket, request) => {
+  const { userId } = url.parse(request.url || '', true).query;
+  const participant = state.participants.find(({ id }) => id === userId);
+  const trainer = state.trainers.find(({ id }) => id === userId);
   console.log('socket connected');
 
-  const connectedUser: User = {
+  const connectedUser: User = participant || trainer || {
     id: `user-id-${Date.now()}`,
     data: {
       name: '',
@@ -67,6 +71,70 @@ webSocketsServer.on('connection', (socket: WebSocket) => {
     },
     socket,
   };
+
+  if (participant || trainer) {
+    connectedUser.socket = socket;
+  }
+
+  if (trainer) {
+    sendEvent(connectedUser.socket, {
+      action: 'ISSUES',
+      payload: {
+        issues: state.issues,
+      },
+    });
+  }
+
+  if (participant) {
+    const participantIssues = state.issues.filter(it => it.userId === participant.id);
+    const activeIssue = participantIssues[participantIssues.length - 1];
+
+    if (activeIssue) {
+      switch (activeIssue.status) {
+        case 'PENDING': {
+          sendEvent(connectedUser.socket, { action: 'ISSUE_RECEIVED' });
+          break;
+        }
+        case 'TAKEN': {
+          sendEvent(connectedUser.socket, {
+            action: 'ISSUE_TAKEN',
+            payload: {
+              trainerName: activeIssue.trainerName,
+            },
+          });
+          break;
+        }
+        case 'HINT': {
+          sendEvent(connectedUser.socket, {
+            action: 'HINT',
+            payload: {
+              hint: activeIssue.hint,
+            },
+          });
+          break;
+        }
+        case 'SOLVED': {
+          sendEvent(connectedUser.socket, {
+            action: 'PARTICIPANT_LOGGED',
+            payload: {
+              userId: connectedUser.id,
+            },
+          });
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+    } else {
+      sendEvent(connectedUser.socket, {
+        action: 'PARTICIPANT_LOGGED',
+        payload: {
+          userId: connectedUser.id,
+        },
+      });
+    }
+  }
 
   socket.on('message', message => {
     console.log(['socket message'], message);
@@ -77,7 +145,12 @@ webSocketsServer.on('connection', (socket: WebSocket) => {
         connectedUser.data = payload;
         state.participants = [...state.participants, connectedUser];
 
-        sendEvent(connectedUser.socket, { action: 'PARTICIPANT_LOGGED' });
+        sendEvent(connectedUser.socket, {
+          action: 'PARTICIPANT_LOGGED',
+          payload: {
+            userId: connectedUser.id,
+          },
+        });
 
         break;
       }
@@ -87,7 +160,10 @@ webSocketsServer.on('connection', (socket: WebSocket) => {
 
         sendEvent(connectedUser.socket, {
           action: 'TRAINER_LOGGED',
-          payload: state.issues,
+          payload: {
+            issues: state.issues,
+            userId: connectedUser.id,
+          },
         });
 
         break;
@@ -100,6 +176,8 @@ webSocketsServer.on('connection', (socket: WebSocket) => {
           userId: connectedUser.id,
           userName: connectedUser.data.name,
           userGroup: connectedUser.data.group,
+          hint: '',
+          trainerName: '',
         }];
 
         sendEvent(connectedUser.socket, { action: 'ISSUE_RECEIVED' });
@@ -107,7 +185,9 @@ webSocketsServer.on('connection', (socket: WebSocket) => {
         state.trainers.forEach(({ socket }) => {
           sendEvent(socket, {
             action: 'ISSUES',
-            payload: state.issues,
+            payload: {
+              issues: state.issues,
+            },
           });
         });
 
@@ -124,15 +204,20 @@ webSocketsServer.on('connection', (socket: WebSocket) => {
 
         sendEvent(participant.socket, {
           action: 'ISSUE_TAKEN',
-          payload: connectedUser.data && connectedUser.data.name,
+          payload: {
+            trainerName: connectedUser.data && connectedUser.data.name,
+          },
         });
 
         issue.status = 'TAKEN';
+        issue.trainerName = connectedUser.data && connectedUser.data.name;
 
         state.trainers.forEach(({ socket }) => {
           sendEvent(socket, {
             action: 'ISSUES',
-            payload: state.issues,
+            payload: {
+              issues: state.issues,
+            },
           });
         });
 
@@ -148,7 +233,9 @@ webSocketsServer.on('connection', (socket: WebSocket) => {
         state.trainers.forEach(({ socket }) => {
           sendEvent(socket, {
             action: 'ISSUES',
-            payload: state.issues,
+            payload: {
+              issues: state.issues,
+            },
           });
         });
 
@@ -165,15 +252,20 @@ webSocketsServer.on('connection', (socket: WebSocket) => {
 
         sendEvent(participant.socket, {
           action: 'HINT',
-          payload: payload.hint,
+          payload: {
+            hint: payload.hint,
+          },
         });
 
         issue.status = 'HINT';
+        issue.hint = payload.hint;
 
         state.trainers.forEach(({ socket }) => {
           sendEvent(socket, {
             action: 'ISSUES',
-            payload: state.issues,
+            payload: {
+              issues: state.issues,
+            },
           });
         });
 
@@ -189,7 +281,9 @@ webSocketsServer.on('connection', (socket: WebSocket) => {
         state.trainers.forEach(({ socket }) => {
           sendEvent(socket, {
             action: 'ISSUES',
-            payload: state.issues,
+            payload: {
+              issues: state.issues,
+            },
           });
         });
 

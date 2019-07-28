@@ -193,7 +193,7 @@ const sendEvent = (action, payload) => {
   
     * Przekazać nową funkcję jako handler funkcję `renderParticipantLoginView`
   
-  * Analogicznie zrobić dla elementu z `id="trainerParticipant"` 
+  * Analogicznie zrobić dla elementu z `id="loginTrainer"` 
 
 * Ekran logowania uczestnika (funkcja `renderParticipantLoginView`)
 

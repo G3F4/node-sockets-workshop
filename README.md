@@ -598,7 +598,7 @@ Obsłużyć rozwiązanie problemu.
     
     * Jeśli nie znaleziono przerwać `switch`
     
-  * Wysłać do uczestnika event z akcją `HINT` i `payload` równym `payload.id`
+  * Wysłać do uczestnika event z akcją `HINT` i `payload` równym `payload.hint`
   
   * Zmienić status zgłoszenia na `HINT`
   

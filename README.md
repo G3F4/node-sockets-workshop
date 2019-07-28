@@ -525,7 +525,7 @@ Obsłużyć rozwiązanie problemu.
 
   * Dodać nasłuchiwanie na kliknięcie w przycisk `Problem rozwiązany`
 
-    * Wysłać event z akcją `ISSUE_SOLVED` z `payload` bez `payload`
+    * Wysłać event z akcją `ISSUE_SOLVED` z pustym `payload`
 
     * Zmienić na ekran zgłaszania problemu (`renderIssueSubmitView`)
 

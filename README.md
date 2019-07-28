@@ -247,7 +247,7 @@ const sendEvent = (action, payload) => {
 
   * Obiekt reprezentujący podłączonego użytkownika 
   
-    * `type` - `PARTICIPANT` lub `TRAINER` 
+    * `id` - identyfikator użytkownika
     
     * `data` - dane zebrane podczas logowania 
     

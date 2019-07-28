@@ -622,7 +622,7 @@ Obsłużyć rozwiązanie problemu.
     
       * Wysłać event z akcją `ISSUE_SOLVED`
       
-      * Wyświetlić ekran zgłaszania (`renderIssueReceivedView`)
+      * Wyświetlić ekran zgłaszania (`renderIssueSubmitView`)
   
     * Dodać nasłuchiwanie na kliknięcie na element o `id="hintFail"`
     
@@ -642,7 +642,7 @@ Obsłużyć rozwiązanie problemu.
     
     * Jeśli nie znaleziono przerwać `switch`
     
-  * Zmienić status zgłoszenia na `HINT`
+  * Zmienić status zgłoszenia na `PENDING`
     
   * Wysłać do wszystkich trenerów zmienioną listę zgłoszeń
 

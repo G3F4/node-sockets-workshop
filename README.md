@@ -478,7 +478,7 @@ Dodać obsługę przyjęcia zgłoszenia przez trenera.
 
   * Znaleźć w kolekcji zgłoszenie wykorzystując `payload` zawierający identyfikator zgłoszenia i zapisać do stałej `issue`
     
-    * `userId` zgłoszenia równe `payload`
+    * `id` zgłoszenia równe `payload`
         
     * `status` różne od `SOLVED`
    

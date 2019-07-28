@@ -570,13 +570,17 @@ Obsłużyć rozwiązanie problemu.
       
       * `userId` - identyfikator użytkowanika (`it.userId`)
       
-  * Zadbać o ukrywanie formularza gdy status równy `TAKEN`
-  
-    * Dodać nowy `case` dla statusu o wartości `TAKEN`
+  * Dodać nowy `case` dla statusu o wartości `TAKEN`
+      
+  * Zadbać o ukrywanie przycisku gdy status równy `TAKEN`
+    
+    * Ukryć element przycisku dodając do niego klasę `hide`
+    
+   * Zadbać o ukrywanie formularza gdy status równy `PENDING`
     
     * Ukryć element formularza dodając do niego klasę `hide`
     
-  * Ukryć formularz domyślnie oraz kiedy status zgłoszenia równy `PENDING`
+  * Ukryć formularz oraz przycisk domyślnie
   
 ### Server:
 
